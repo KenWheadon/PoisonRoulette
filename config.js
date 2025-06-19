@@ -6,7 +6,6 @@ const GAME_CONFIG = {
   initialHealth: 100,
   initialStats: {
     speed: 0,
-    shield: 0,
     sabotage: 0,
     toxin: 0,
   },
@@ -17,7 +16,6 @@ const GAME_CONFIG = {
 
   // Damage and Effects
   toxinDecayRate: 1, // How much toxin decreases each turn
-  shieldEfficiency: 5, // How much damage each shield point absorbs
 
   // Toast Duration
   toastDuration: 4000, // milliseconds
@@ -62,12 +60,11 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 100,
-        health: 5,
-        speed: -2,
-        shield: 0,
-        sabotage: -1,
-        toxin: 0,
-        description: "Safe but sluggish",
+        health: 8,
+        speed: -1,
+        sabotage: 0,
+        toxin: 2,
+        description: "Safe but builds poison slowly",
       },
     ],
   },
@@ -76,21 +73,19 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 70,
-        health: 15,
-        speed: 1,
-        shield: 0,
+        health: 18,
+        speed: 2,
         sabotage: 1,
-        toxin: 0,
-        description: "Refreshing boost!",
+        toxin: 1,
+        description: "Refreshing boost with mild toxin!",
       },
       {
         chance: 30,
-        health: -8,
+        health: -5,
         speed: 0,
-        shield: 0,
-        sabotage: 2,
-        toxin: 1,
-        description: "Mild poison, but you learned something",
+        sabotage: 3,
+        toxin: 3,
+        description: "Bitter lesson with building poison",
       },
     ],
   },
@@ -99,21 +94,19 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 50,
-        health: 20,
-        speed: 2,
-        shield: 0,
+        health: 25,
+        speed: 3,
         sabotage: 0,
-        toxin: 0,
-        description: "Lucky break!",
+        toxin: 1,
+        description: "Lucky break with slight toxin!",
       },
       {
         chance: 50,
-        health: -10,
+        health: -8,
         speed: 0,
-        shield: 0,
-        sabotage: 3,
-        toxin: 1,
-        description: "Painful lesson",
+        sabotage: 4,
+        toxin: 2,
+        description: "Painful lesson, moderate poison",
       },
     ],
   },
@@ -122,21 +115,19 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 30,
-        health: 25,
-        speed: 1,
-        shield: 1,
-        sabotage: 0,
+        health: 30,
+        speed: 2,
+        sabotage: 1,
         toxin: 0,
-        description: "Heroic power surge!",
+        description: "Heroic power with no toxin!",
       },
       {
         chance: 70,
-        health: -20,
+        health: -25,
         speed: 0,
-        shield: 0,
-        sabotage: 5,
-        toxin: 2,
-        description: "Brutal but empowering",
+        sabotage: 6,
+        toxin: 1,
+        description: "Brutal damage, light poison",
       },
     ],
   },
@@ -145,21 +136,19 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 25,
-        health: 35,
-        speed: 3,
-        shield: 2,
-        sabotage: 0,
+        health: 40,
+        speed: 4,
+        sabotage: 2,
         toxin: 0,
-        description: "Mystical enhancement!",
+        description: "Mystical enhancement, no toxin!",
       },
       {
         chance: 75,
-        health: -25,
+        health: -30,
         speed: -1,
-        shield: 0,
-        sabotage: 8,
-        toxin: 3,
-        description: "Cursed but vengeful",
+        sabotage: 10,
+        toxin: 1,
+        description: "Cursed damage, minimal poison",
       },
     ],
   },
@@ -168,22 +157,20 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 20,
-        health: 40,
-        speed: 4,
-        shield: 3,
-        sabotage: 0,
+        health: 50,
+        speed: 5,
+        sabotage: 3,
         toxin: 0,
-        description: "DEATH DEFIED! Ultimate power!",
-        steal: 10,
+        description: "DEATH DEFIED! Pure power!",
+        steal: 15,
       },
       {
         chance: 80,
-        health: -35,
+        health: -40,
         speed: -2,
-        shield: 1,
-        sabotage: 12,
-        toxin: 4,
-        description: "Near death, but ultimate vengeance",
+        sabotage: 15,
+        toxin: 0,
+        description: "Near death, but no lingering poison",
       },
     ],
   },
@@ -231,7 +218,6 @@ const ACTION_EFFECTS = {
   neutralize: {
     health: 5,
     speed: 0,
-    shield: 0,
     sabotage: 0,
     toxin: 0,
     description: "Neutralized - safe",
@@ -250,13 +236,14 @@ const AI_CONFIG = {
 
 // Probability Text for Tooltips
 const DRINK_PROBABILITY_TEXT = {
-  blue: "Safe but slow: +5❤️ -2⚡ -1🔧",
-  green: "70% boost (+15❤️ +1⚡ +1🔧)<br>30% mild poison (-8❤️ +2🔧 +1☠️)",
-  yellow: "50% lucky (+20❤️ +2⚡)<br>50% painful (-10❤️ +3🔧 +1☠️)",
-  red: "30% heroic (+25❤️ +1⚡ +1🛡️)<br>70% brutal (-20❤️ +5🔧 +2☠️)",
-  purple: "25% mystical (+35❤️ +3⚡ +2🛡️)<br>75% cursed (-25❤️ -1⚡ +8🔧 +3☠️)",
+  blue: "Safe but toxic: +8❤️ -1⚡ +2☠️",
+  green: "70% boost (+18❤️ +2⚡ +1🔧 +1☠️)<br>30% bitter (-5❤️ +3🔧 +3☠️)",
+  yellow: "50% lucky (+25❤️ +3⚡ +1☠️)<br>50% painful (-8❤️ +4🔧 +2☠️)",
+  red: "30% heroic (+30❤️ +2⚡ +1🔧)<br>70% brutal (-25❤️ +6🔧 +1☠️)",
+  purple:
+    "25% mystical (+40❤️ +4⚡ +2🔧)<br>75% cursed (-30❤️ -1⚡ +10🔧 +1☠️)",
   black:
-    "20% ultimate (+40❤️ +4⚡ +3🛡️ +steal)<br>80% near death (-35❤️ -2⚡ +12🔧 +4☠️)",
+    "20% ultimate (+50❤️ +5⚡ +3🔧 +steal)<br>80% near death (-40❤️ -2⚡ +15🔧)",
 };
 
 // Risk Assessment for AI (1 = safest, 6 = most dangerous)

@@ -130,11 +130,10 @@ function updateStatsTable() {
       !player.alive ? "eliminated" : ""
     }`;
 
-    // Create cells for each stat
+    // Create cells for each stat (removed shield)
     const stats = [
       { value: player.name, class: "player-name-cell" },
       { value: player.speed },
-      { value: player.shield },
       { value: player.sabotage },
       { value: player.toxin },
     ];
@@ -282,19 +281,6 @@ function processDrink(player, drink) {
   // Apply effects to player
   applyEffectsToPlayer(player, outcome);
 
-  // Handle damage reduction from shield
-  if (outcome.health < 0 && player.shield > 0) {
-    const damageReduced = Math.min(
-      Math.abs(outcome.health),
-      player.shield * GAME_CONFIG.shieldEfficiency
-    );
-    player.health = Math.min(100, player.health + damageReduced);
-    player.shield = Math.max(
-      0,
-      player.shield - Math.ceil(damageReduced / GAME_CONFIG.shieldEfficiency)
-    );
-  }
-
   // Handle health stealing
   if (outcome.steal) {
     gameState.players.forEach((p) => {
@@ -331,7 +317,6 @@ function processDrink(player, drink) {
 function applyEffectsToPlayer(player, outcome) {
   player.health = Math.max(0, Math.min(100, player.health + outcome.health));
   player.speed = Math.max(-10, player.speed + outcome.speed);
-  player.shield = Math.max(0, player.shield + outcome.shield);
   player.sabotage = Math.max(0, player.sabotage + outcome.sabotage);
   player.toxin = Math.max(0, player.toxin + outcome.toxin);
 }
@@ -340,7 +325,6 @@ function applyEffectsToPlayer(player, outcome) {
 function showEffectChanges(playerIndex, outcome) {
   const effects = [
     { stat: "speed", value: outcome.speed },
-    { stat: "shield", value: outcome.shield },
     { stat: "sabotage", value: outcome.sabotage },
     { stat: "toxin", value: outcome.toxin },
   ];
@@ -377,8 +361,6 @@ function getEffectsText(effect) {
     effects.push(`${effect.health > 0 ? "+" : ""}${effect.health}❤️`);
   if (effect.speed !== 0)
     effects.push(`${effect.speed > 0 ? "+" : ""}${effect.speed}⚡`);
-  if (effect.shield !== 0)
-    effects.push(`${effect.shield > 0 ? "+" : ""}${effect.shield}🛡️`);
   if (effect.sabotage !== 0)
     effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
   if (effect.toxin !== 0)
@@ -638,10 +620,10 @@ function startNewGame() {
 // Visual Effect Functions
 function showStatChange(playerIndex, stat, change) {
   const statsGrid = document.getElementById("stats-grid");
-  const statIndex = { speed: 1, shield: 2, sabotage: 3, toxin: 4 }[stat];
+  const statIndex = { speed: 1, sabotage: 2, toxin: 3 }[stat];
   if (!statIndex) return;
 
-  const cellIndex = playerIndex * 5 + statIndex; // 5 columns per player
+  const cellIndex = playerIndex * 4 + statIndex; // 4 columns per player (removed shield)
   const cells = statsGrid.querySelectorAll(".stats-cell");
   const targetCell = cells[cellIndex];
 
@@ -717,7 +699,6 @@ function showDrinkOutcome(player, drink, outcome) {
   const effectsToShow = [
     { label: "❤️ Health", value: outcome.health },
     { label: "⚡ Speed", value: outcome.speed },
-    { label: "🛡️ Shield", value: outcome.shield },
     { label: "🔧 Sabotage", value: outcome.sabotage },
     { label: "☠️ Toxin", value: outcome.toxin },
   ].filter((effect) => effect.value !== 0);
