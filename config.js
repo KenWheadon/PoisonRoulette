@@ -5,7 +5,6 @@ const GAME_CONFIG = {
   // Player Configuration
   initialHealth: 100,
   initialStats: {
-    speed: 0,
     sabotage: 0,
     toxin: 0,
   },
@@ -61,7 +60,6 @@ const DRINK_EFFECTS = {
       {
         chance: 100,
         health: 8,
-        speed: -1,
         sabotage: 0,
         toxin: 2,
         description: "Safe but builds poison slowly",
@@ -74,7 +72,6 @@ const DRINK_EFFECTS = {
       {
         chance: 70,
         health: 18,
-        speed: 2,
         sabotage: 1,
         toxin: 1,
         description: "Refreshing boost with mild toxin!",
@@ -82,7 +79,6 @@ const DRINK_EFFECTS = {
       {
         chance: 30,
         health: -5,
-        speed: 0,
         sabotage: 3,
         toxin: 3,
         description: "Bitter lesson with building poison",
@@ -95,7 +91,6 @@ const DRINK_EFFECTS = {
       {
         chance: 50,
         health: 25,
-        speed: 3,
         sabotage: 0,
         toxin: 1,
         description: "Lucky break with slight toxin!",
@@ -103,7 +98,6 @@ const DRINK_EFFECTS = {
       {
         chance: 50,
         health: -8,
-        speed: 0,
         sabotage: 4,
         toxin: 2,
         description: "Painful lesson, moderate poison",
@@ -116,7 +110,6 @@ const DRINK_EFFECTS = {
       {
         chance: 30,
         health: 30,
-        speed: 2,
         sabotage: 1,
         toxin: 0,
         description: "Heroic power with no toxin!",
@@ -124,7 +117,6 @@ const DRINK_EFFECTS = {
       {
         chance: 70,
         health: -25,
-        speed: 0,
         sabotage: 6,
         toxin: 1,
         description: "Brutal damage, light poison",
@@ -137,7 +129,6 @@ const DRINK_EFFECTS = {
       {
         chance: 25,
         health: 40,
-        speed: 4,
         sabotage: 2,
         toxin: 0,
         description: "Mystical enhancement, no toxin!",
@@ -145,7 +136,6 @@ const DRINK_EFFECTS = {
       {
         chance: 75,
         health: -30,
-        speed: -1,
         sabotage: 10,
         toxin: 1,
         description: "Cursed damage, minimal poison",
@@ -158,7 +148,6 @@ const DRINK_EFFECTS = {
       {
         chance: 20,
         health: 50,
-        speed: 5,
         sabotage: 3,
         toxin: 0,
         description: "DEATH DEFIED! Pure power!",
@@ -167,7 +156,6 @@ const DRINK_EFFECTS = {
       {
         chance: 80,
         health: -40,
-        speed: -2,
         sabotage: 15,
         toxin: 0,
         description: "Near death, but no lingering poison",
@@ -208,6 +196,18 @@ const ACTIONS = [
     cost: 3,
     description: "Add +15 damage to drink",
   },
+  {
+    id: "poison",
+    name: "Poison",
+    cost: 5,
+    description: "Add +3 toxin to drink",
+  },
+  {
+    id: "deadly_poison",
+    name: "Deadly Poison",
+    cost: 12,
+    description: "Add +10 toxin to drink",
+  },
 ];
 
 // Drink Color Options
@@ -217,13 +217,18 @@ const DRINK_COLORS = ["blue", "green", "yellow", "red", "purple", "black"];
 const ACTION_EFFECTS = {
   neutralize: {
     health: 5,
-    speed: 0,
     sabotage: 0,
     toxin: 0,
     description: "Neutralized - safe",
   },
   spike: {
     additionalDamage: 15,
+  },
+  poison: {
+    additionalToxin: 3,
+  },
+  deadly_poison: {
+    additionalToxin: 10,
   },
 };
 
@@ -236,14 +241,12 @@ const AI_CONFIG = {
 
 // Probability Text for Tooltips
 const DRINK_PROBABILITY_TEXT = {
-  blue: "Safe but toxic: +8❤️ -1⚡ +2☠️",
-  green: "70% boost (+18❤️ +2⚡ +1🔧 +1☠️)<br>30% bitter (-5❤️ +3🔧 +3☠️)",
-  yellow: "50% lucky (+25❤️ +3⚡ +1☠️)<br>50% painful (-8❤️ +4🔧 +2☠️)",
-  red: "30% heroic (+30❤️ +2⚡ +1🔧)<br>70% brutal (-25❤️ +6🔧 +1☠️)",
-  purple:
-    "25% mystical (+40❤️ +4⚡ +2🔧)<br>75% cursed (-30❤️ -1⚡ +10🔧 +1☠️)",
-  black:
-    "20% ultimate (+50❤️ +5⚡ +3🔧 +steal)<br>80% near death (-40❤️ -2⚡ +15🔧)",
+  blue: "Safe but toxic: +8❤️ +2☠️",
+  green: "70% boost (+18❤️ +1🔧 +1☠️)<br>30% bitter (-5❤️ +3🔧 +3☠️)",
+  yellow: "50% lucky (+25❤️ +1☠️)<br>50% painful (-8❤️ +4🔧 +2☠️)",
+  red: "30% heroic (+30❤️ +1🔧)<br>70% brutal (-25❤️ +6🔧 +1☠️)",
+  purple: "25% mystical (+40❤️ +2🔧)<br>75% cursed (-30❤️ +10🔧 +1☠️)",
+  black: "20% ultimate (+50❤️ +3🔧 +steal)<br>80% near death (-40❤️ +15🔧)",
 };
 
 // Risk Assessment for AI (1 = safest, 6 = most dangerous)

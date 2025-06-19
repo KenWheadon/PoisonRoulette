@@ -103,12 +103,12 @@ h1 {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: 150px repeat(3, 1fr);
+  grid-template-columns: 150px repeat(2, 1fr);
   gap: 1px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  min-width: 500px;
+  min-width: 400px;
 }
 
 .stats-header {
@@ -818,8 +818,8 @@ h1 {
   }
 
   .stats-grid {
-    grid-template-columns: 120px repeat(3, 1fr);
-    min-width: 400px;
+    grid-template-columns: 120px repeat(2, 1fr);
+    min-width: 300px;
   }
 
   .drinks-container {
@@ -878,8 +878,8 @@ h1 {
   }
 
   .stats-grid {
-    grid-template-columns: 100px repeat(3, 1fr);
-    min-width: 350px;
+    grid-template-columns: 100px repeat(2, 1fr);
+    min-width: 250px;
     font-size: 0.8em;
   }
 

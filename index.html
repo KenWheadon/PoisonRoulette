@@ -11,7 +11,7 @@
       <h1>☠️ Poison Roulette</h1>
 
       <div class="turn-order">
-        <h3>Turn Order (Speed Based)</h3>
+        <h3>Current Turn</h3>
         <div id="turn-order-display"></div>
       </div>
 
@@ -23,7 +23,6 @@
         <h3>📊 Player Statistics</h3>
         <div class="stats-grid" id="stats-grid">
           <div class="stats-header">Player</div>
-          <div class="stats-header">⚡ Speed</div>
           <div class="stats-header">🔧 Sabotage</div>
           <div class="stats-header">☠️ Toxin</div>
           <!-- Player stats will be generated here -->
@@ -104,36 +103,33 @@
           <div class="legend-title">Drink Effects Guide</div>
 
           <div class="legend-row">
-            <span style="color: #74b9ff">🔵 Blue Elixir:</span> +8❤️ -1⚡ +2☠️
-            (Safe but builds toxin over time)
+            <span style="color: #74b9ff">🔵 Blue Elixir:</span> +8❤️ +2☠️ (Safe
+            but builds toxin over time)
           </div>
 
           <div class="legend-row">
             <span style="color: #00b894">🟢 Green Brew:</span> 70% chance for
-            good effects (+18❤️ +2⚡ +1🔧 +1☠️), 30% bitter taste (-5❤️ +3🔧
-            +3☠️)
+            good effects (+18❤️ +1🔧 +1☠️), 30% bitter taste (-5❤️ +3🔧 +3☠️)
           </div>
 
           <div class="legend-row">
             <span style="color: #fdcb6e">🟡 Yellow Mixture:</span> 50/50 gamble
-            - either lucky (+25❤️ +3⚡ +1☠️) or painful (-8❤️ +4🔧 +2☠️)
+            - either lucky (+25❤️ +1☠️) or painful (-8❤️ +4🔧 +2☠️)
           </div>
 
           <div class="legend-row">
             <span style="color: #ff6b6b">🔴 Red Potion:</span> 30% heroic power
-            (+30❤️ +2⚡ +1🔧), 70% brutal damage (-25❤️ +6🔧 +1☠️)
+            (+30❤️ +1🔧), 70% brutal damage (-25❤️ +6🔧 +1☠️)
           </div>
 
           <div class="legend-row">
             <span style="color: #a29bfe">🟣 Purple Draught:</span> 25% mystical
-            enhancement (+40❤️ +4⚡ +2🔧), 75% cursed damage (-30❤️ -1⚡ +10🔧
-            +1☠️)
+            enhancement (+40❤️ +2🔧), 75% cursed damage (-30❤️ +10🔧 +1☠️)
           </div>
 
           <div class="legend-row">
             <span style="color: #636e72">⚫ Black Essence:</span> 20% ultimate
-            power (+50❤️ +5⚡ +3🔧 + steal 15❤️), 80% near death (-40❤️ -2⚡
-            +15🔧)
+            power (+50❤️ +3🔧 + steal 15❤️), 80% near death (-40❤️ +15🔧)
           </div>
 
           <div
@@ -145,13 +141,13 @@
             "
           >
             <strong>Stats Explained:</strong><br />
-            ❤️ Health | ⚡ Speed (turn order) | 🔧 Sabotage (action currency) |
-            ☠️ Toxin (cumulative damage)
+            ❤️ Health | 🔧 Sabotage (action currency) | ☠️ Toxin (cumulative
+            damage)
           </div>
 
           <div style="margin-top: 15px; font-size: 0.85em">
             <strong>Actions:</strong> Duplicate, Neutralize, Eliminate, Analyze,
-            or Spike drinks using 🔧 Sabotage points
+            Spike, Poison, or Deadly Poison drinks using 🔧 Sabotage points
           </div>
         </div>
       </div>

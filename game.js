@@ -26,6 +26,13 @@ function initializeGame() {
     turnOrder: [],
   };
 
+  // Ensure all players have the correct structure (remove any old speed properties)
+  gameState.players.forEach((player) => {
+    delete player.speed; // Remove speed if it exists
+    if (typeof player.sabotage === "undefined") player.sabotage = 0;
+    if (typeof player.toxin === "undefined") player.toxin = 0;
+  });
+
   generateDrinks();
   updateTurnOrder();
   updateDisplay();
@@ -54,19 +61,24 @@ function generateDrinks() {
       spiked: false,
       analyzed: false,
       effects: null,
+      poisoned: false,
+      poisonAmount: 0,
     });
   }
 }
 
-// Update Turn Order Based on Speed
+// Update Turn Order Based on Round-Robin
 function updateTurnOrder() {
-  gameState.turnOrder = gameState.players
-    .filter((p) => p.alive)
-    .sort((a, b) => b.speed - a.speed)
-    .map((p) => p.name);
+  // Simple round-robin system - no speed-based ordering
+  const alivePlayers = gameState.players.filter((p) => p.alive);
+  const currentPlayerName =
+    alivePlayers.length > 0
+      ? gameState.players[gameState.currentPlayerIndex]?.name ||
+        alivePlayers[0].name
+      : "None";
 
   const display = document.getElementById("turn-order-display");
-  display.textContent = gameState.turnOrder.join(" → ");
+  display.textContent = currentPlayerName;
 }
 
 // Update All Display Elements
@@ -130,10 +142,9 @@ function updateStatsTable() {
       !player.alive ? "eliminated" : ""
     }`;
 
-    // Create cells for each stat (removed shield)
+    // Create cells for each stat (only sabotage and toxin now)
     const stats = [
       { value: player.name, class: "player-name-cell" },
-      { value: player.speed },
       { value: player.sabotage },
       { value: player.toxin },
     ];
@@ -182,6 +193,8 @@ function updateDrinks() {
         tooltipContent += "<br><em>Neutralized: +5 health only</em>";
       if (drink.spiked)
         tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
+      if (drink.poisoned)
+        tooltipContent += `<br><em>Poisoned: +${drink.poisonAmount} extra toxin</em>`;
 
       tooltip.innerHTML = tooltipContent;
 
@@ -276,6 +289,9 @@ function processDrink(player, drink) {
         health: outcome.health - ACTION_EFFECTS.spike.additionalDamage,
       };
     }
+    if (drink.poisoned) {
+      outcome = { ...outcome, toxin: outcome.toxin + drink.poisonAmount };
+    }
   }
 
   // Apply effects to player
@@ -316,7 +332,6 @@ function processDrink(player, drink) {
 // Apply Effects to Player Stats
 function applyEffectsToPlayer(player, outcome) {
   player.health = Math.max(0, Math.min(100, player.health + outcome.health));
-  player.speed = Math.max(-10, player.speed + outcome.speed);
   player.sabotage = Math.max(0, player.sabotage + outcome.sabotage);
   player.toxin = Math.max(0, player.toxin + outcome.toxin);
 }
@@ -324,7 +339,6 @@ function applyEffectsToPlayer(player, outcome) {
 // Show Visual Effect Changes
 function showEffectChanges(playerIndex, outcome) {
   const effects = [
-    { stat: "speed", value: outcome.speed },
     { stat: "sabotage", value: outcome.sabotage },
     { stat: "toxin", value: outcome.toxin },
   ];
@@ -359,8 +373,6 @@ function getEffectsText(effect) {
   const effects = [];
   if (effect.health !== 0)
     effects.push(`${effect.health > 0 ? "+" : ""}${effect.health}❤️`);
-  if (effect.speed !== 0)
-    effects.push(`${effect.speed > 0 ? "+" : ""}${effect.speed}⚡`);
   if (effect.sabotage !== 0)
     effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
   if (effect.toxin !== 0)
@@ -437,6 +449,21 @@ function performAction(actionId) {
         "action"
       );
       break;
+
+    case "poison":
+      drink.poisoned = true;
+      drink.poisonAmount = ACTION_EFFECTS.poison.additionalToxin;
+      logMessage(`${currentPlayer.name} poisoned ${drink.name}!`, "action");
+      break;
+
+    case "deadly_poison":
+      drink.poisoned = true;
+      drink.poisonAmount = ACTION_EFFECTS.deadly_poison.additionalToxin;
+      logMessage(
+        `${currentPlayer.name} laced ${drink.name} with deadly poison!`,
+        "action"
+      );
+      break;
   }
 
   gameState.selectedDrink = null;
@@ -502,25 +529,23 @@ function nextTurn() {
 }
 
 function findNextPlayerIndex() {
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  const currentTurnIndex = gameState.turnOrder.indexOf(currentPlayer.name);
+  const alivePlayers = gameState.players.filter((p) => p.alive);
+  if (alivePlayers.length === 0) return -1;
 
-  for (let i = 1; i < gameState.turnOrder.length; i++) {
-    const nextPlayerName =
-      gameState.turnOrder[(currentTurnIndex + i) % gameState.turnOrder.length];
-    const nextPlayer = gameState.players.find((p) => p.name === nextPlayerName);
-    if (nextPlayer && nextPlayer.alive) {
-      return gameState.players.indexOf(nextPlayer);
-    }
-  }
-  return -1;
+  let nextIndex = gameState.currentPlayerIndex;
+  do {
+    nextIndex = (nextIndex + 1) % gameState.players.length;
+  } while (
+    !gameState.players[nextIndex].alive &&
+    nextIndex !== gameState.currentPlayerIndex
+  );
+
+  return gameState.players[nextIndex].alive ? nextIndex : -1;
 }
 
 function isRoundComplete(nextIndex) {
-  const firstPlayer = gameState.players.find(
-    (p) => p.name === gameState.turnOrder[0]
-  );
-  return nextIndex === gameState.players.indexOf(firstPlayer);
+  // Simple check - if we've gone through all players once, round is complete
+  return false; // For now, just continue round-robin
 }
 
 // AI Turn Logic
@@ -569,13 +594,10 @@ function aiTurn() {
 // Game Flow Functions
 function startDrinkingPhase() {
   gameState.phase = "drinking";
-  gameState.currentPlayerIndex = 0;
 
-  // Set current player to first in turn order
-  const firstPlayer = gameState.players.find(
-    (p) => p.name === gameState.turnOrder[0]
-  );
-  gameState.currentPlayerIndex = gameState.players.indexOf(firstPlayer);
+  // Find first alive player
+  const firstAliveIndex = gameState.players.findIndex((p) => p.alive);
+  gameState.currentPlayerIndex = firstAliveIndex >= 0 ? firstAliveIndex : 0;
 
   updateDisplay();
 
@@ -620,10 +642,11 @@ function startNewGame() {
 // Visual Effect Functions
 function showStatChange(playerIndex, stat, change) {
   const statsGrid = document.getElementById("stats-grid");
-  const statIndex = { speed: 1, sabotage: 2, toxin: 3 }[stat];
+  const statIndex = { sabotage: 1, toxin: 2 }[stat];
   if (!statIndex) return;
 
-  const cellIndex = playerIndex * 4 + statIndex; // 4 columns per player (removed shield)
+  // 3 columns per player: [name, sabotage, toxin]
+  const cellIndex = playerIndex * 3 + statIndex;
   const cells = statsGrid.querySelectorAll(".stats-cell");
   const targetCell = cells[cellIndex];
 
@@ -698,7 +721,6 @@ function showDrinkOutcome(player, drink, outcome) {
   effects.innerHTML = "";
   const effectsToShow = [
     { label: "❤️ Health", value: outcome.health },
-    { label: "⚡ Speed", value: outcome.speed },
     { label: "🔧 Sabotage", value: outcome.sabotage },
     { label: "☠️ Toxin", value: outcome.toxin },
   ].filter((effect) => effect.value !== 0);
