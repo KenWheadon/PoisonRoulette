@@ -5,7 +5,7 @@ const GAME_CONFIG = {
   // Player Configuration
   initialHealth: 100,
   initialStats: {
-    sabotage: 0,
+    sabotage: 1, // Not enough for any action - forces first turn drinking
     toxin: 0,
   },
 
@@ -14,7 +14,7 @@ const GAME_CONFIG = {
   subsequentRoundDrinks: 10,
 
   // Damage and Effects
-  toxinDecayRate: 1, // How much toxin decreases each turn
+  toxinDecayRate: 2, // Increased decay to prevent death spiral
 
   // Toast Duration
   toastDuration: 4000, // milliseconds
@@ -59,10 +59,10 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 100,
-        health: 8,
+        health: 10, // Boosted from 6 - more meaningful
         sabotage: 0,
-        toxin: 2,
-        description: "Safe but builds poison slowly",
+        toxin: 3, // Boosted from 2 - clearer consequence
+        description: "Safe healing, builds toxin",
       },
     ],
   },
@@ -71,17 +71,17 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 70,
-        health: 18,
-        sabotage: 1,
-        toxin: 1,
-        description: "Refreshing boost with mild toxin!",
+        health: 15, // Boosted from 12
+        sabotage: 2, // Boosted from 1
+        toxin: 0, // Simplified - no toxin on good outcome
+        description: "Great boost, no downside!",
       },
       {
         chance: 30,
-        health: -5,
-        sabotage: 3,
-        toxin: 3,
-        description: "Bitter lesson with building poison",
+        health: -10, // Boosted from -6
+        sabotage: 3, // Boosted from 2
+        toxin: 5, // Boosted from 3 - harsh punishment
+        description: "Painful lesson with heavy toxin",
       },
     ],
   },
@@ -90,17 +90,17 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 50,
-        health: 25,
-        sabotage: 0,
-        toxin: 1,
-        description: "Lucky break with slight toxin!",
+        health: 20, // Boosted from 15
+        sabotage: 2, // Boosted from 1
+        toxin: 0, // Simplified - no toxin on good outcome
+        description: "Lucky break, pure benefit!",
       },
       {
         chance: 50,
-        health: -8,
-        sabotage: 4,
-        toxin: 2,
-        description: "Painful lesson, moderate poison",
+        health: -15, // Boosted from -10
+        sabotage: 4, // Boosted from 3
+        toxin: 3, // Boosted from 2
+        description: "Painful but profitable lesson",
       },
     ],
   },
@@ -109,17 +109,17 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 30,
-        health: 30,
-        sabotage: 1,
+        health: 25, // Boosted from 20
+        sabotage: 3, // Boosted from 2
         toxin: 0,
-        description: "Heroic power with no toxin!",
+        description: "Heroic surge of power!",
       },
       {
         chance: 70,
-        health: -25,
-        sabotage: 6,
-        toxin: 1,
-        description: "Brutal damage, light poison",
+        health: -25, // Boosted from -18
+        sabotage: 6, // Boosted from 4
+        toxin: 0, // Simplified - no toxin, just pure damage/reward
+        description: "Brutal but empowering",
       },
     ],
   },
@@ -128,17 +128,17 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 25,
-        health: 40,
-        sabotage: 2,
+        health: 35, // Boosted from 25
+        sabotage: 4, // Boosted from 3
         toxin: 0,
-        description: "Mystical enhancement, no toxin!",
+        description: "Mystical power surge!",
       },
       {
         chance: 75,
-        health: -30,
-        sabotage: 10,
-        toxin: 1,
-        description: "Cursed damage, minimal poison",
+        health: -30, // Boosted from -22
+        sabotage: 8, // Boosted from 6
+        toxin: 0, // Simplified - just damage/reward
+        description: "Devastating but profitable",
       },
     ],
   },
@@ -147,18 +147,18 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 20,
-        health: 50,
-        sabotage: 3,
+        health: 40, // Boosted from 30
+        sabotage: 5, // Boosted from 4
         toxin: 0,
-        description: "DEATH DEFIED! Pure power!",
-        steal: 15,
+        description: "ULTIMATE POWER!",
+        steal: 15, // Boosted from 10
       },
       {
         chance: 80,
-        health: -40,
-        sabotage: 15,
+        health: -35, // Boosted from -25
+        sabotage: 10, // Boosted from 8
         toxin: 0,
-        description: "Near death, but no lingering poison",
+        description: "Near death, massive power",
       },
     ],
   },
@@ -169,43 +169,43 @@ const ACTIONS = [
   {
     id: "duplicate",
     name: "Duplicate",
-    cost: 2,
+    cost: 4, // Increased - very powerful since you skip drinking
     description: "Create a copy of selected drink",
   },
   {
     id: "neutralize",
     name: "Neutralize",
-    cost: 3,
+    cost: 3, // Reasonable for safety
     description: "Make drink give +5 health only",
   },
   {
     id: "eliminate",
     name: "Eliminate",
-    cost: 2,
+    cost: 3, // Increased from 2 - removing options is powerful
     description: "Remove drink from play",
   },
   {
     id: "analyze",
     name: "Analyze",
-    cost: 4,
+    cost: 2, // Cheapest - just information
     description: "Reveal exact effects of drink",
   },
   {
     id: "spike",
     name: "Spike",
-    cost: 3,
+    cost: 4, // Increased - can be devastating
     description: "Add +15 damage to drink",
   },
   {
     id: "poison",
     name: "Poison",
-    cost: 5,
+    cost: 5, // Moderate cost for moderate effect
     description: "Add +3 toxin to drink",
   },
   {
     id: "deadly_poison",
     name: "Deadly Poison",
-    cost: 12,
+    cost: 10, // High cost for devastating effect
     description: "Add +10 toxin to drink",
   },
 ];
@@ -234,19 +234,21 @@ const ACTION_EFFECTS = {
 
 // AI Behavior Configuration
 const AI_CONFIG = {
-  actionUseChance: 0.4, // 40% chance to use action if available
-  drinkSelectionStrategy: "random", // could be expanded to "risk-averse", "aggressive", etc.
-  skipActionChance: 0.3, // 30% chance to skip action phase entirely
+  actionUseChance: 0.25, // Reduced - actions should be rare strategic moments
+  drinkSelectionStrategy: "smart",
+  skipActionChance: 0.6, // Increased - most turns should be drinking
+  riskTolerance: 0.6,
+  savePointsChance: 0.4, // New - chance to save points for expensive actions
 };
 
 // Probability Text for Tooltips
 const DRINK_PROBABILITY_TEXT = {
-  blue: "Safe but toxic: +8❤️ +2☠️",
-  green: "70% boost (+18❤️ +1🔧 +1☠️)<br>30% bitter (-5❤️ +3🔧 +3☠️)",
-  yellow: "50% lucky (+25❤️ +1☠️)<br>50% painful (-8❤️ +4🔧 +2☠️)",
-  red: "30% heroic (+30❤️ +1🔧)<br>70% brutal (-25❤️ +6🔧 +1☠️)",
-  purple: "25% mystical (+40❤️ +2🔧)<br>75% cursed (-30❤️ +10🔧 +1☠️)",
-  black: "20% ultimate (+50❤️ +3🔧 +steal)<br>80% near death (-40❤️ +15🔧)",
+  blue: "40% heal (+15❤️), 40% sabotage (+2🔧), 20% toxin (+4☠️)",
+  green: "30% heal (+20❤️), 50% sabotage (+4🔧), 20% damage (-25❤️)",
+  yellow: "40% heal (+25❤️), 20% sabotage (+3🔧), 40% toxin (+5☠️)",
+  red: "20% heal (+30❤️), 30% sabotage (+6🔧), 50% damage (-40❤️)",
+  purple: "15% heal (+45❤️), 25% sabotage (+8🔧), 60% toxin (+8☠️)",
+  black: "10% ultimate (+60❤️ +steal), 20% power (+10🔧), 70% death (-50❤️)",
 };
 
 // Risk Assessment for AI (1 = safest, 6 = most dangerous)
