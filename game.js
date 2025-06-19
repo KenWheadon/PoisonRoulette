@@ -159,6 +159,30 @@ function updateStatsTable() {
   });
 }
 
+// UPDATED: Dynamic tooltip generation from config
+function generateDrinkTooltip(drink) {
+  let tooltipContent = `<strong>${drink.name}</strong><br>`;
+
+  if (drink.analyzed) {
+    // Show exact effect that will happen
+    const effect = getRandomOutcome(DRINK_EFFECTS[drink.color]);
+    tooltipContent += `${effect.description}<br>`;
+    tooltipContent += getEffectsText(effect);
+  } else {
+    // Show probabilities from config using our dynamic function
+    tooltipContent += generateDrinkTooltipText(drink.color);
+  }
+
+  // Add modifier effects
+  if (drink.neutralized)
+    tooltipContent += "<br><em>Neutralized: +5 health only</em>";
+  if (drink.spiked) tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
+  if (drink.poisoned)
+    tooltipContent += `<br><em>Poisoned: +${drink.poisonAmount} extra toxin</em>`;
+
+  return tooltipContent;
+}
+
 // Update Drinks Display
 function updateDrinks() {
   const container = document.getElementById("drinks-container");
@@ -175,28 +199,10 @@ function updateDrinks() {
       drinkDiv.className = classes;
       drinkDiv.onclick = () => selectDrink(drink.id);
 
-      // Create tooltip
+      // Create tooltip with dynamic content
       const tooltip = document.createElement("div");
       tooltip.className = "drink-tooltip";
-
-      let tooltipContent = `<strong>${drink.name}</strong><br>`;
-
-      if (drink.analyzed) {
-        const effect = getRandomOutcome(DRINK_EFFECTS[drink.color]);
-        tooltipContent += `${effect.description}<br>`;
-        tooltipContent += getEffectsText(effect);
-      } else {
-        tooltipContent += DRINK_PROBABILITY_TEXT[drink.color];
-      }
-
-      if (drink.neutralized)
-        tooltipContent += "<br><em>Neutralized: +5 health only</em>";
-      if (drink.spiked)
-        tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
-      if (drink.poisoned)
-        tooltipContent += `<br><em>Poisoned: +${drink.poisonAmount} extra toxin</em>`;
-
-      tooltip.innerHTML = tooltipContent;
+      tooltip.innerHTML = generateDrinkTooltip(drink);
 
       drinkDiv.innerHTML = `<div class="drink-liquid"></div>`;
       drinkDiv.appendChild(tooltip);
@@ -368,17 +374,9 @@ function getRandomOutcome(drinkEffect) {
   return drinkEffect.outcomes[0];
 }
 
-// Get Effects Text for Display
+// Get Effects Text for Display - UPDATED to use utility function
 function getEffectsText(effect) {
-  const effects = [];
-  if (effect.health !== 0)
-    effects.push(`${effect.health > 0 ? "+" : ""}${effect.health}❤️`);
-  if (effect.sabotage !== 0)
-    effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
-  if (effect.toxin !== 0)
-    effects.push(`${effect.toxin > 0 ? "+" : ""}${effect.toxin}☠️`);
-  if (effect.steal) effects.push(`Steal ${effect.steal}❤️`);
-  return effects.join(" ");
+  return getFormattedEffectsText(effect);
 }
 
 // Action Modal Functions

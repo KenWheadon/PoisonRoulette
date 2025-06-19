@@ -59,9 +59,9 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 100,
-        health: 10, // Boosted from 6 - more meaningful
+        health: 8,
         sabotage: 0,
-        toxin: 3, // Boosted from 2 - clearer consequence
+        toxin: 2,
         description: "Safe healing, builds toxin",
       },
     ],
@@ -71,17 +71,17 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 70,
-        health: 15, // Boosted from 12
-        sabotage: 2, // Boosted from 1
-        toxin: 0, // Simplified - no toxin on good outcome
-        description: "Great boost, no downside!",
+        health: 18,
+        sabotage: 1,
+        toxin: 1,
+        description: "Beneficial with minor toxin",
       },
       {
         chance: 30,
-        health: -10, // Boosted from -6
-        sabotage: 3, // Boosted from 2
-        toxin: 5, // Boosted from 3 - harsh punishment
-        description: "Painful lesson with heavy toxin",
+        health: -5,
+        sabotage: 3,
+        toxin: 3,
+        description: "Bitter taste, harsh lesson",
       },
     ],
   },
@@ -90,16 +90,16 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 50,
-        health: 20, // Boosted from 15
-        sabotage: 2, // Boosted from 1
-        toxin: 0, // Simplified - no toxin on good outcome
-        description: "Lucky break, pure benefit!",
+        health: 25,
+        sabotage: 0,
+        toxin: 1,
+        description: "Lucky fortune!",
       },
       {
         chance: 50,
-        health: -15, // Boosted from -10
-        sabotage: 4, // Boosted from 3
-        toxin: 3, // Boosted from 2
+        health: -8,
+        sabotage: 4,
+        toxin: 2,
         description: "Painful but profitable lesson",
       },
     ],
@@ -109,16 +109,16 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 30,
-        health: 25, // Boosted from 20
-        sabotage: 3, // Boosted from 2
+        health: 30,
+        sabotage: 1,
         toxin: 0,
         description: "Heroic surge of power!",
       },
       {
         chance: 70,
-        health: -25, // Boosted from -18
-        sabotage: 6, // Boosted from 4
-        toxin: 0, // Simplified - no toxin, just pure damage/reward
+        health: -25,
+        sabotage: 6,
+        toxin: 1,
         description: "Brutal but empowering",
       },
     ],
@@ -128,16 +128,16 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 25,
-        health: 35, // Boosted from 25
-        sabotage: 4, // Boosted from 3
+        health: 40,
+        sabotage: 2,
         toxin: 0,
         description: "Mystical power surge!",
       },
       {
         chance: 75,
-        health: -30, // Boosted from -22
-        sabotage: 8, // Boosted from 6
-        toxin: 0, // Simplified - just damage/reward
+        health: -30,
+        sabotage: 10,
+        toxin: 1,
         description: "Devastating but profitable",
       },
     ],
@@ -147,16 +147,16 @@ const DRINK_EFFECTS = {
     outcomes: [
       {
         chance: 20,
-        health: 40, // Boosted from 30
-        sabotage: 5, // Boosted from 4
+        health: 50,
+        sabotage: 3,
         toxin: 0,
         description: "ULTIMATE POWER!",
-        steal: 15, // Boosted from 10
+        steal: 15,
       },
       {
         chance: 80,
-        health: -35, // Boosted from -25
-        sabotage: 10, // Boosted from 8
+        health: -40,
+        sabotage: 15,
         toxin: 0,
         description: "Near death, massive power",
       },
@@ -169,43 +169,43 @@ const ACTIONS = [
   {
     id: "duplicate",
     name: "Duplicate",
-    cost: 4, // Increased - very powerful since you skip drinking
+    cost: 4,
     description: "Create a copy of selected drink",
   },
   {
     id: "neutralize",
     name: "Neutralize",
-    cost: 3, // Reasonable for safety
+    cost: 3,
     description: "Make drink give +5 health only",
   },
   {
     id: "eliminate",
     name: "Eliminate",
-    cost: 3, // Increased from 2 - removing options is powerful
+    cost: 3,
     description: "Remove drink from play",
   },
   {
     id: "analyze",
     name: "Analyze",
-    cost: 2, // Cheapest - just information
+    cost: 2,
     description: "Reveal exact effects of drink",
   },
   {
     id: "spike",
     name: "Spike",
-    cost: 4, // Increased - can be devastating
+    cost: 4,
     description: "Add +15 damage to drink",
   },
   {
     id: "poison",
     name: "Poison",
-    cost: 5, // Moderate cost for moderate effect
+    cost: 5,
     description: "Add +3 toxin to drink",
   },
   {
     id: "deadly_poison",
     name: "Deadly Poison",
-    cost: 10, // High cost for devastating effect
+    cost: 10,
     description: "Add +10 toxin to drink",
   },
 ];
@@ -234,22 +234,60 @@ const ACTION_EFFECTS = {
 
 // AI Behavior Configuration
 const AI_CONFIG = {
-  actionUseChance: 0.25, // Reduced - actions should be rare strategic moments
+  actionUseChance: 0.25,
   drinkSelectionStrategy: "smart",
-  skipActionChance: 0.6, // Increased - most turns should be drinking
+  skipActionChance: 0.6,
   riskTolerance: 0.6,
-  savePointsChance: 0.4, // New - chance to save points for expensive actions
+  savePointsChance: 0.4,
 };
 
-// Probability Text for Tooltips
-const DRINK_PROBABILITY_TEXT = {
-  blue: "40% heal (+15❤️), 40% sabotage (+2🔧), 20% toxin (+4☠️)",
-  green: "30% heal (+20❤️), 50% sabotage (+4🔧), 20% damage (-25❤️)",
-  yellow: "40% heal (+25❤️), 20% sabotage (+3🔧), 40% toxin (+5☠️)",
-  red: "20% heal (+30❤️), 30% sabotage (+6🔧), 50% damage (-40❤️)",
-  purple: "15% heal (+45❤️), 25% sabotage (+8🔧), 60% toxin (+8☠️)",
-  black: "10% ultimate (+60❤️ +steal), 20% power (+10🔧), 70% death (-50❤️)",
-};
+// DYNAMIC TOOLTIP GENERATION - Auto-generates from DRINK_EFFECTS
+// This function creates tooltip text from the actual config values
+function generateDrinkTooltipText(color) {
+  const drinkEffect = DRINK_EFFECTS[color];
+  if (!drinkEffect) return "Unknown drink";
+
+  const outcomes = drinkEffect.outcomes;
+  const tooltipParts = [];
+
+  outcomes.forEach((outcome) => {
+    const effects = [];
+
+    // Add health effect if not zero
+    if (outcome.health !== 0) {
+      effects.push(`${outcome.health > 0 ? "+" : ""}${outcome.health}❤️`);
+    }
+
+    // Add sabotage effect if not zero
+    if (outcome.sabotage !== 0) {
+      effects.push(`${outcome.sabotage > 0 ? "+" : ""}${outcome.sabotage}🔧`);
+    }
+
+    // Add toxin effect if not zero
+    if (outcome.toxin !== 0) {
+      effects.push(`${outcome.toxin > 0 ? "+" : ""}${outcome.toxin}☠️`);
+    }
+
+    // Add steal effect if present
+    if (outcome.steal) {
+      effects.push(`steal ${outcome.steal}❤️`);
+    }
+
+    // Create the outcome string
+    const effectsText = effects.length > 0 ? `(${effects.join(" ")})` : "";
+    tooltipParts.push(`${outcome.chance}% ${effectsText}`);
+  });
+
+  return tooltipParts.join(", ");
+}
+
+// DYNAMIC PROBABILITY TEXT - Generated from actual config
+const DRINK_PROBABILITY_TEXT = {};
+
+// Auto-populate the probability text from config
+DRINK_COLORS.forEach((color) => {
+  DRINK_PROBABILITY_TEXT[color] = generateDrinkTooltipText(color);
+});
 
 // Risk Assessment for AI (1 = safest, 6 = most dangerous)
 const DRINK_RISK_SCORES = {
@@ -264,7 +302,7 @@ const DRINK_RISK_SCORES = {
 // Game Messages
 const GAME_MESSAGES = {
   gameStart:
-    "Game started! Everyone begins with 0 action points - drink to earn them!",
+    "Game started! Everyone begins with 1 action point - not enough for most actions!",
   newRound: "New drinks prepared for the next round!",
   gameOverWin: (winner) =>
     `Game Over! ${winner} mastered all stats and survived!`,
@@ -274,3 +312,26 @@ const GAME_MESSAGES = {
     `${player} uses ${action} on ${drink}!`,
   drinkConsumed: (player, drink) => `${player} drinks ${drink}...`,
 };
+
+// Utility function to get formatted effects text for any outcome
+function getFormattedEffectsText(outcome) {
+  const effects = [];
+
+  if (outcome.health !== 0) {
+    effects.push(`${outcome.health > 0 ? "+" : ""}${outcome.health}❤️`);
+  }
+
+  if (outcome.sabotage !== 0) {
+    effects.push(`${outcome.sabotage > 0 ? "+" : ""}${outcome.sabotage}🔧`);
+  }
+
+  if (outcome.toxin !== 0) {
+    effects.push(`${outcome.toxin > 0 ? "+" : ""}${outcome.toxin}☠️`);
+  }
+
+  if (outcome.steal) {
+    effects.push(`Steal ${outcome.steal}❤️`);
+  }
+
+  return effects.join(" ");
+}

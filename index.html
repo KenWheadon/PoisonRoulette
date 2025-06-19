@@ -95,41 +95,16 @@
       </div>
     </div>
 
-    <!-- Help Modal -->
+    <!-- Help Modal - UPDATED to use dynamic content -->
     <div id="help-modal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeHelpModal()">&times;</span>
         <div class="drink-legend">
           <div class="legend-title">Drink Effects Guide</div>
 
-          <div class="legend-row">
-            <span style="color: #74b9ff">🔵 Blue Elixir:</span> +8❤️ +2☠️ (Safe
-            but builds toxin over time)
-          </div>
-
-          <div class="legend-row">
-            <span style="color: #00b894">🟢 Green Brew:</span> 70% chance for
-            good effects (+18❤️ +1🔧 +1☠️), 30% bitter taste (-5❤️ +3🔧 +3☠️)
-          </div>
-
-          <div class="legend-row">
-            <span style="color: #fdcb6e">🟡 Yellow Mixture:</span> 50/50 gamble
-            - either lucky (+25❤️ +1☠️) or painful (-8❤️ +4🔧 +2☠️)
-          </div>
-
-          <div class="legend-row">
-            <span style="color: #ff6b6b">🔴 Red Potion:</span> 30% heroic power
-            (+30❤️ +1🔧), 70% brutal damage (-25❤️ +6🔧 +1☠️)
-          </div>
-
-          <div class="legend-row">
-            <span style="color: #a29bfe">🟣 Purple Draught:</span> 25% mystical
-            enhancement (+40❤️ +2🔧), 75% cursed damage (-30❤️ +10🔧 +1☠️)
-          </div>
-
-          <div class="legend-row">
-            <span style="color: #636e72">⚫ Black Essence:</span> 20% ultimate
-            power (+50❤️ +3🔧 + steal 15❤️), 80% near death (-40❤️ +15🔧)
+          <!-- Dynamic content will be populated here -->
+          <div id="dynamic-drink-effects">
+            <!-- This will be filled by JavaScript -->
           </div>
 
           <div
@@ -158,5 +133,48 @@
     <!-- Load game configuration and logic -->
     <script src="config.js"></script>
     <script src="game.js"></script>
+    <script>
+      // Populate help modal with dynamic content when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        populateHelpModal();
+      });
+
+      function populateHelpModal() {
+        const container = document.getElementById("dynamic-drink-effects");
+        const drinkColors = {
+          blue: "#74b9ff",
+          green: "#00b894",
+          yellow: "#fdcb6e",
+          red: "#ff6b6b",
+          purple: "#a29bfe",
+          black: "#636e72",
+        };
+
+        const drinkEmojis = {
+          blue: "🔵",
+          green: "🟢",
+          yellow: "🟡",
+          red: "🔴",
+          purple: "🟣",
+          black: "⚫",
+        };
+
+        DRINK_COLORS.forEach((color) => {
+          const drinkEffect = DRINK_EFFECTS[color];
+          const row = document.createElement("div");
+          row.className = "legend-row";
+
+          const colorStyle = `color: ${drinkColors[color]}`;
+          const tooltipText = generateDrinkTooltipText(color);
+
+          row.innerHTML = `
+            <span style="${colorStyle}">${drinkEmojis[color]} ${drinkEffect.name}:</span> 
+            ${tooltipText}
+          `;
+
+          container.appendChild(row);
+        });
+      }
+    </script>
   </body>
 </html>
