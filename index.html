@@ -128,7 +128,8 @@
         padding: 10px 8px;
         text-align: center;
         font-size: clamp(0.8em, 1.8vw, 0.9em);
-        transition: background 0.3s ease;
+        transition: all 0.3s ease;
+        position: relative;
       }
 
       .stats-cell.player-name-cell {
@@ -146,6 +147,255 @@
       .stats-cell.eliminated {
         opacity: 0.5;
         color: #ff6b6b;
+      }
+
+      .stat-change {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: bold;
+        font-size: 0.9em;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .stat-change.positive {
+        color: #4ecdc4;
+        animation: statChangeUp 2s ease-out;
+      }
+
+      .stat-change.negative {
+        color: #ff6b6b;
+        animation: statChangeDown 2s ease-out;
+      }
+
+      @keyframes statChangeUp {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: translate(-50%, -80%) scale(1.2);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -100%) scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes statChangeDown {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: translate(-50%, -20%) scale(1.2);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, 0%) scale(1);
+          opacity: 0;
+        }
+      }
+
+      .drink-outcome-modal {
+        display: none;
+        position: fixed;
+        z-index: 1500;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+      }
+
+      .outcome-content {
+        background: linear-gradient(135deg, #2d3436, #636e72);
+        margin: 15% auto;
+        padding: 40px;
+        border-radius: 20px;
+        width: clamp(300px, 80vw, 500px);
+        text-align: center;
+        border: 3px solid;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        animation: outcomeAppear 0.5s ease-out;
+      }
+
+      .outcome-content.positive {
+        border-color: #4ecdc4;
+        box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
+      }
+
+      .outcome-content.negative {
+        border-color: #ff6b6b;
+        box-shadow: 0 0 30px rgba(255, 107, 107, 0.4);
+      }
+
+      .outcome-content.neutral {
+        border-color: #74b9ff;
+        box-shadow: 0 0 30px rgba(116, 185, 255, 0.4);
+      }
+
+      @keyframes outcomeAppear {
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .outcome-drink {
+        width: 80px;
+        height: 120px;
+        background: linear-gradient(
+          180deg,
+          transparent 15%,
+          #333 15%,
+          #333 90%,
+          #444 90%
+        );
+        border-radius: 10px 10px 20px 20px;
+        margin: 0 auto 20px auto;
+        position: relative;
+        border: 3px solid #666;
+      }
+
+      .outcome-drink .drink-liquid {
+        position: absolute;
+        bottom: 6px;
+        left: 6px;
+        right: 6px;
+        height: 70%;
+        border-radius: 0 0 15px 15px;
+        opacity: 0.9;
+      }
+
+      .outcome-title {
+        font-size: 1.8em;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .outcome-title.positive {
+        color: #4ecdc4;
+      }
+
+      .outcome-title.negative {
+        color: #ff6b6b;
+      }
+
+      .outcome-title.neutral {
+        color: #74b9ff;
+      }
+
+      .outcome-description {
+        font-size: 1.2em;
+        margin-bottom: 25px;
+        color: #ddd;
+      }
+
+      .outcome-effects {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .effect-item {
+        padding: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        font-weight: bold;
+      }
+
+      .effect-item.positive {
+        background: rgba(78, 205, 196, 0.2);
+        color: #4ecdc4;
+      }
+
+      .effect-item.negative {
+        background: rgba(255, 107, 107, 0.2);
+        color: #ff6b6b;
+      }
+
+      .effect-item.neutral {
+        background: rgba(116, 185, 255, 0.2);
+        color: #74b9ff;
+      }
+
+      .continue-btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        border: none;
+        color: white;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-size: 1.1em;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .continue-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .health-change {
+        position: absolute;
+        top: -10px;
+        right: 10px;
+        font-weight: bold;
+        font-size: 1.2em;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .health-change.positive {
+        color: #4ecdc4;
+        animation: healthUp 2s ease-out;
+      }
+
+      .health-change.negative {
+        color: #ff6b6b;
+        animation: healthDown 2s ease-out;
+      }
+
+      @keyframes healthUp {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-20px) scale(1.3);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-40px) scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes healthDown {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-20px) scale(1.3);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-40px) scale(1);
+          opacity: 0;
+        }
       }
 
       .toast-container {
@@ -264,6 +514,42 @@
         box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
       }
 
+      .drink-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.85em;
+        white-space: nowrap;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 300px;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .drink:hover .drink-tooltip {
+        opacity: 1;
+      }
+
+      .drink-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: rgba(0, 0, 0, 0.9);
+      }
+
       .drink-liquid {
         position: absolute;
         bottom: 6px;
@@ -319,15 +605,33 @@
         min-width: 120px;
       }
 
-      .btn:hover {
+      .btn:hover:not(:disabled) {
         transform: translateY(-2px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
       }
 
       .btn:disabled {
-        opacity: 0.5;
+        opacity: 0.4;
         cursor: not-allowed;
         transform: none;
+        background: linear-gradient(45deg, #666, #777);
+      }
+
+      .btn.action-available {
+        background: linear-gradient(45deg, #ffd93d, #fdcb6e);
+        color: #333;
+        box-shadow: 0 0 20px rgba(255, 217, 61, 0.4);
+        animation: actionPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes actionPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(255, 217, 61, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 30px rgba(255, 217, 61, 0.7);
+        }
       }
 
       .btn.secondary {
@@ -673,7 +977,7 @@
   </head>
   <body>
     <div class="game-container">
-      <h1>☠️ Poison Roulette</h1>
+      <h1>🥂☠️ Poison Roulette ☠️🥂</h1>
 
       <div class="turn-order">
         <h3>Turn Order (Speed Based)</h3>
@@ -701,8 +1005,21 @@
       </div>
 
       <div class="controls">
-        <button class="btn" id="drink-btn" onclick="drinkSelected()" disabled>
-          Drink Selected
+        <button
+          class="btn"
+          id="drink-btn"
+          onclick="drinkSelected()"
+          style="display: none"
+        >
+          Select a Drink
+        </button>
+        <button
+          class="btn"
+          id="action-btn"
+          onclick="openActionModal()"
+          style="display: none"
+        >
+          ACTIONS
         </button>
         <button
           class="btn"
@@ -720,6 +1037,21 @@
 
       <div class="toast-container" id="toast-container">
         <!-- Toast notifications will appear here -->
+      </div>
+
+      <!-- Drink Outcome Modal -->
+      <div id="outcome-modal" class="drink-outcome-modal">
+        <div class="outcome-content" id="outcome-content">
+          <div class="outcome-drink" id="outcome-drink">
+            <div class="drink-liquid" id="outcome-liquid"></div>
+          </div>
+          <div class="outcome-title" id="outcome-title"></div>
+          <div class="outcome-description" id="outcome-description"></div>
+          <div class="outcome-effects" id="outcome-effects"></div>
+          <button class="continue-btn" onclick="closeOutcomeModal()">
+            Continue
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1023,10 +1355,13 @@
         gameState.drinks = [];
         const colors = ["blue", "green", "yellow", "red", "purple", "black"];
 
-        for (let i = 0; i < 15; i++) {
+        // First round: 8 drinks, subsequent rounds: 10 drinks
+        const numDrinks = gameState.round === 1 ? 8 : 10;
+
+        for (let i = 0; i < numDrinks; i++) {
           const color = colors[Math.floor(Math.random() * colors.length)];
           gameState.drinks.push({
-            id: i,
+            id: gameState.drinks.length,
             color: color,
             name: `${color.charAt(0).toUpperCase() + color.slice(1)} Elixir`,
             consumed: false,
@@ -1159,41 +1494,108 @@
             drinkDiv.className = classes;
             drinkDiv.onclick = () => selectDrink(drink.id);
 
-            let tooltip = drink.name;
+            // Create tooltip with potion effects
+            const tooltip = document.createElement("div");
+            tooltip.className = "drink-tooltip";
+
+            let tooltipContent = `<strong>${drink.name}</strong><br>`;
+
             if (drink.analyzed) {
               const effect = getRandomOutcome(drinkEffects[drink.color]);
-              tooltip += `\n${effect.description}`;
+              tooltipContent += `${effect.description}<br>`;
+              tooltipContent += getEffectsText(effect);
+            } else {
+              tooltipContent += getProbabilityText(drink.color);
             }
-            if (drink.neutralized) tooltip += "\n(Neutralized - Safe)";
-            if (drink.spiked) tooltip += "\n(Spiked - Extra Damage)";
 
-            drinkDiv.title = tooltip;
+            if (drink.neutralized)
+              tooltipContent += "<br><em>Neutralized: +5 health only</em>";
+            if (drink.spiked)
+              tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
+
+            tooltip.innerHTML = tooltipContent;
 
             drinkDiv.innerHTML = `<div class="drink-liquid"></div>`;
+            drinkDiv.appendChild(tooltip);
             container.appendChild(drinkDiv);
           }
         });
       }
 
+      function getProbabilityText(color) {
+        const info = {
+          blue: "Safe but slow: +5❤️ -2⚡ -1🔧",
+          green:
+            "70% boost (+15❤️ +1⚡ +1🔧)<br>30% mild poison (-8❤️ +2🔧 +1☠️)",
+          yellow: "50% lucky (+20❤️ +2⚡)<br>50% painful (-10❤️ +3🔧 +1☠️)",
+          red: "30% heroic (+25❤️ +1⚡ +1🛡️)<br>70% brutal (-20❤️ +5🔧 +2☠️)",
+          purple:
+            "25% mystical (+35❤️ +3⚡ +2🛡️)<br>75% cursed (-25❤️ -1⚡ +8🔧 +3☠️)",
+          black:
+            "20% ultimate (+40❤️ +4⚡ +3🛡️ +steal)<br>80% near death (-35❤️ -2⚡ +12🔧 +4☠️)",
+        };
+        return info[color] || "Unknown effects";
+      }
+
+      function getEffectsText(effect) {
+        const effects = [];
+        if (effect.health !== 0)
+          effects.push(`${effect.health > 0 ? "+" : ""}${effect.health}❤️`);
+        if (effect.speed !== 0)
+          effects.push(`${effect.speed > 0 ? "+" : ""}${effect.speed}⚡`);
+        if (effect.shield !== 0)
+          effects.push(`${effect.shield > 0 ? "+" : ""}${effect.shield}🛡️`);
+        if (effect.sabotage !== 0)
+          effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
+        if (effect.toxin !== 0)
+          effects.push(`${effect.toxin > 0 ? "+" : ""}${effect.toxin}☠️`);
+        if (effect.steal) effects.push(`Steal ${effect.steal}❤️`);
+        return effects.join(" ");
+      }
+
       function updateControls() {
         const drinkBtn = document.getElementById("drink-btn");
+        const actionBtn = document.getElementById("action-btn");
         const newGameBtn = document.getElementById("new-game-btn");
 
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         const isHumanTurn =
           currentPlayer && currentPlayer.isHuman && currentPlayer.alive;
+        const hasSelection = gameState.selectedDrink !== null;
+        const canUseAction = currentPlayer && currentPlayer.sabotage >= 2;
 
-        // Show drink button if it's drinking phase, or action button if player has sabotage points
-        if (isHumanTurn && currentPlayer.sabotage >= 2) {
-          drinkBtn.textContent = "Use Action";
-          drinkBtn.disabled =
-            gameState.selectedDrink === null || gameState.gameOver;
+        // Show/hide buttons based on selection and turn
+        if (isHumanTurn && hasSelection && !gameState.gameOver) {
+          drinkBtn.style.display = "inline-block";
+          actionBtn.style.display = "inline-block";
+
+          drinkBtn.disabled = false;
+          drinkBtn.textContent = "DRINK";
+
+          if (canUseAction) {
+            actionBtn.disabled = false;
+            actionBtn.className = "btn action-available";
+            actionBtn.textContent = "ACTIONS";
+          } else {
+            actionBtn.disabled = true;
+            actionBtn.className = "btn";
+            actionBtn.textContent = "ACTIONS";
+          }
         } else {
-          drinkBtn.textContent = "Drink Selected";
-          drinkBtn.disabled =
-            !isHumanTurn ||
-            gameState.selectedDrink === null ||
-            gameState.gameOver;
+          // Hide buttons when not human turn or no selection
+          if (!isHumanTurn || gameState.gameOver) {
+            drinkBtn.style.display = "none";
+            actionBtn.style.display = "none";
+          } else {
+            // Show disabled buttons when no selection
+            drinkBtn.style.display = "inline-block";
+            actionBtn.style.display = "inline-block";
+            drinkBtn.disabled = true;
+            actionBtn.disabled = true;
+            drinkBtn.textContent = "Select a Drink";
+            actionBtn.textContent = "ACTIONS";
+            actionBtn.className = "btn";
+          }
         }
 
         newGameBtn.style.display = gameState.gameOver ? "inline-block" : "none";
@@ -1205,33 +1607,17 @@
         gameState.selectedDrink = drinkId;
         updateDisplay();
 
-        // If player has action points, show action modal
-        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-        if (
-          currentPlayer &&
-          currentPlayer.isHuman &&
-          currentPlayer.sabotage >= 2
-        ) {
-          openActionModal();
-        }
+        // No longer auto-open action modal - player must click ACTION button
       }
 
       function openActionModal() {
+        if (gameState.selectedDrink === null) return;
+
         const modal = document.getElementById("action-modal");
         const actionButtons = document.getElementById("action-buttons");
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
 
         actionButtons.innerHTML = "";
-
-        // Add "Just Drink" option
-        const drinkButton = document.createElement("button");
-        drinkButton.className = "action-btn";
-        drinkButton.innerHTML = `<strong>Just Drink</strong><br>No cost<br><small>Drink the selected potion</small>`;
-        drinkButton.onclick = () => {
-          closeActionModal();
-          drinkSelected();
-        };
-        actionButtons.appendChild(drinkButton);
 
         // Add action options
         actions.forEach((action) => {
@@ -1421,6 +1807,27 @@
         nextTurn();
       }
 
+      function showToast(message, type = "") {
+        const toastContainer = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+
+        toastContainer.appendChild(toast);
+
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.classList.add("removing");
+            setTimeout(() => {
+              if (toast.parentNode) {
+                toastContainer.removeChild(toast);
+              }
+            }, 300);
+          }
+        }, 4000);
+      }
+
       function processDrink(player, drink) {
         drink.consumed = true;
 
@@ -1441,7 +1848,14 @@
           }
         }
 
+        // Store old values for visual feedback
         const oldHealth = player.health;
+        const oldSpeed = player.speed;
+        const oldShield = player.shield;
+        const oldSabotage = player.sabotage;
+        const oldToxin = player.toxin;
+
+        // Apply effects
         player.health = Math.max(
           0,
           Math.min(100, player.health + outcome.health)
@@ -1451,6 +1865,7 @@
         player.sabotage = Math.max(0, player.sabotage + outcome.sabotage);
         player.toxin = Math.max(0, player.toxin + outcome.toxin);
 
+        // Handle damage reduction from shield
         if (outcome.health < 0 && player.shield > 0) {
           const damageReduced = Math.min(
             Math.abs(outcome.health),
@@ -1463,10 +1878,13 @@
           );
         }
 
+        // Handle health stealing
         if (outcome.steal) {
           gameState.players.forEach((p) => {
             if (p !== player && p.alive) {
-              p.health = Math.max(0, p.health - outcome.steal);
+              const stolenHealth = Math.min(outcome.steal, p.health);
+              p.health = Math.max(0, p.health - stolenHealth);
+              player.health = Math.min(100, player.health + stolenHealth);
             }
           });
         }
@@ -1475,11 +1893,31 @@
           player.alive = false;
         }
 
-        let logClass = outcome.health < 0 ? "danger" : "heal";
-        logMessage(
-          `${player.name} drank ${drink.name}! ${outcome.description}`,
-          logClass
-        );
+        // Show visual feedback
+        const playerIndex = gameState.players.indexOf(player);
+
+        // Show stat changes
+        if (outcome.speed !== 0)
+          showStatChange(playerIndex, "speed", outcome.speed);
+        if (outcome.shield !== 0)
+          showStatChange(playerIndex, "shield", outcome.shield);
+        if (outcome.sabotage !== 0)
+          showStatChange(playerIndex, "sabotage", outcome.sabotage);
+        if (outcome.toxin !== 0)
+          showStatChange(playerIndex, "toxin", outcome.toxin);
+
+        // Show health change
+        if (outcome.health !== 0) showHealthChange(playerIndex, outcome.health);
+
+        // Show outcome modal for human player
+        if (player.isHuman) {
+          setTimeout(() => {
+            showDrinkOutcome(player, drink, outcome);
+          }, 500);
+        }
+
+        // Update display
+        updateDisplay();
 
         gameState.selectedDrink = null;
       }
@@ -1615,7 +2053,7 @@
         ) {
           // Round complete
           gameState.round++;
-          if (gameState.drinks.filter((d) => !d.consumed).length < 5) {
+          if (gameState.drinks.filter((d) => !d.consumed).length === 0) {
             generateDrinks();
             logMessage("New drinks prepared for the next round!");
           }
@@ -1721,25 +2159,113 @@
         initializeGame();
       }
 
-      function showToast(message, type = "") {
-        const toastContainer = document.getElementById("toast-container");
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
+      function showStatChange(playerIndex, stat, change) {
+        const statsGrid = document.getElementById("stats-grid");
+        const statIndex = { speed: 1, shield: 2, sabotage: 3, toxin: 4 }[stat];
+        if (!statIndex) return;
 
-        toastContainer.appendChild(toast);
+        const cellIndex = playerIndex * 5 + statIndex; // 5 columns per player
+        const cells = statsGrid.querySelectorAll(".stats-cell");
+        const targetCell = cells[cellIndex];
 
-        // Auto-remove after 4 seconds
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.classList.add("removing");
-            setTimeout(() => {
-              if (toast.parentNode) {
-                toastContainer.removeChild(toast);
-              }
-            }, 300);
-          }
-        }, 4000);
+        if (targetCell && change !== 0) {
+          const changeElement = document.createElement("div");
+          changeElement.className = `stat-change ${
+            change > 0 ? "positive" : "negative"
+          }`;
+          changeElement.textContent = `${change > 0 ? "+" : ""}${change}`;
+
+          targetCell.style.position = "relative";
+          targetCell.appendChild(changeElement);
+
+          setTimeout(() => {
+            if (changeElement.parentNode) {
+              targetCell.removeChild(changeElement);
+            }
+          }, 2000);
+        }
+      }
+
+      function showHealthChange(playerIndex, change) {
+        const playerCard = document.getElementById(`player-${playerIndex}`);
+        if (playerCard && change !== 0) {
+          const changeElement = document.createElement("div");
+          changeElement.className = `health-change ${
+            change > 0 ? "positive" : "negative"
+          }`;
+          changeElement.textContent = `${change > 0 ? "+" : ""}${change}`;
+
+          playerCard.style.position = "relative";
+          playerCard.appendChild(changeElement);
+
+          setTimeout(() => {
+            if (changeElement.parentNode) {
+              playerCard.removeChild(changeElement);
+            }
+          }, 2000);
+        }
+      }
+
+      function showDrinkOutcome(player, drink, outcome) {
+        const modal = document.getElementById("outcome-modal");
+        const content = document.getElementById("outcome-content");
+        const drinkElement = document.getElementById("outcome-drink");
+        const liquidElement = document.getElementById("outcome-liquid");
+        const title = document.getElementById("outcome-title");
+        const description = document.getElementById("outcome-description");
+        const effects = document.getElementById("outcome-effects");
+
+        // Set drink appearance
+        drinkElement.className = `outcome-drink ${drink.color}`;
+        liquidElement.className = `drink-liquid`;
+
+        // Determine outcome type
+        let outcomeType = "neutral";
+        if (outcome.health > 0 || outcome.speed > 0 || outcome.shield > 0) {
+          outcomeType = "positive";
+        } else if (outcome.health < 0 || outcome.toxin > 0) {
+          outcomeType = "negative";
+        }
+
+        content.className = `outcome-content ${outcomeType}`;
+        title.className = `outcome-title ${outcomeType}`;
+
+        // Set content
+        title.textContent = `${player.name} drank ${drink.name}!`;
+        description.textContent = outcome.description;
+
+        // Show effects
+        effects.innerHTML = "";
+        const effectsToShow = [
+          { label: "❤️ Health", value: outcome.health },
+          { label: "⚡ Speed", value: outcome.speed },
+          { label: "🛡️ Shield", value: outcome.shield },
+          { label: "🔧 Sabotage", value: outcome.sabotage },
+          { label: "☠️ Toxin", value: outcome.toxin },
+        ].filter((effect) => effect.value !== 0);
+
+        effectsToShow.forEach((effect) => {
+          const effectDiv = document.createElement("div");
+          const effectType = effect.value > 0 ? "positive" : "negative";
+          effectDiv.className = `effect-item ${effectType}`;
+          effectDiv.innerHTML = `${effect.label}<br>${
+            effect.value > 0 ? "+" : ""
+          }${effect.value}`;
+          effects.appendChild(effectDiv);
+        });
+
+        if (outcome.steal) {
+          const stealDiv = document.createElement("div");
+          stealDiv.className = "effect-item positive";
+          stealDiv.innerHTML = `💀 Steal<br>+${outcome.steal} from all`;
+          effects.appendChild(stealDiv);
+        }
+
+        modal.style.display = "block";
+      }
+
+      function closeOutcomeModal() {
+        document.getElementById("outcome-modal").style.display = "none";
       }
 
       function logMessage(message, className = "") {
@@ -1750,11 +2276,15 @@
       window.onclick = function (event) {
         const actionModal = document.getElementById("action-modal");
         const helpModal = document.getElementById("help-modal");
+        const outcomeModal = document.getElementById("outcome-modal");
         if (event.target === actionModal) {
           closeActionModal();
         }
         if (event.target === helpModal) {
           closeHelpModal();
+        }
+        if (event.target === outcomeModal) {
+          closeOutcomeModal();
         }
       };
 
