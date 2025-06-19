@@ -598,6 +598,31 @@ h1 {
   opacity: 0.9;
 }
 
+/* Outcome drink color classes */
+.outcome-drink.blue .drink-liquid {
+  background: linear-gradient(180deg, #74b9ff, #0984e3);
+}
+
+.outcome-drink.green .drink-liquid {
+  background: linear-gradient(180deg, #00b894, #00a085);
+}
+
+.outcome-drink.yellow .drink-liquid {
+  background: linear-gradient(180deg, #fdcb6e, #e17055);
+}
+
+.outcome-drink.red .drink-liquid {
+  background: linear-gradient(180deg, #ff6b6b, #d63031);
+}
+
+.outcome-drink.purple .drink-liquid {
+  background: linear-gradient(180deg, #a29bfe, #6c5ce7);
+}
+
+.outcome-drink.black .drink-liquid {
+  background: linear-gradient(180deg, #636e72, #2d3436);
+}
+
 .outcome-title {
   font-size: 1.8em;
   font-weight: bold;

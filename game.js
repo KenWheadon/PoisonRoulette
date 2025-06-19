@@ -255,7 +255,11 @@ function drinkSelected() {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
 
   processDrink(currentPlayer, drink);
-  nextTurn();
+
+  // Only proceed to next turn if it's not a human player (human waits for modal close)
+  if (!currentPlayer.isHuman) {
+    nextTurn();
+  }
 }
 
 // Process Drinking a Potion
@@ -311,15 +315,16 @@ function processDrink(player, drink) {
   const playerIndex = gameState.players.indexOf(player);
   showEffectChanges(playerIndex, outcome);
 
-  // Show outcome modal for human player
+  // Show outcome modal for human player, then proceed to next turn
   if (player.isHuman) {
     setTimeout(() => {
       showDrinkOutcome(player, drink, outcome);
     }, 500);
+  } else {
+    // For AI players, update display and continue immediately
+    updateDisplay();
+    gameState.selectedDrink = null;
   }
-
-  updateDisplay();
-  gameState.selectedDrink = null;
 }
 
 // Apply Effects to Player Stats
@@ -739,6 +744,11 @@ function showDrinkOutcome(player, drink, outcome) {
 
 function closeOutcomeModal() {
   document.getElementById("outcome-modal").style.display = "none";
+
+  // After closing the modal, proceed to next turn
+  updateDisplay();
+  gameState.selectedDrink = null;
+  nextTurn();
 }
 
 // Help Modal Functions
