@@ -77,13 +77,12 @@ function updateTurnOrder() {
 // Update All Display Elements
 function updateDisplay() {
   updatePlayers();
-  updateStatsTable();
   updateDrinks();
   updateControls();
   updateTurnOrder();
 }
 
-// Update Player Display Cards
+// Update Player Display Cards - NOW WITH INTEGRATED STATS
 function updatePlayers() {
   const grid = document.getElementById("players-grid");
   grid.innerHTML = "";
@@ -104,10 +103,18 @@ function updatePlayers() {
       <div class="health-bar">
         <div class="health-fill" style="width: ${healthPercentage}%"></div>
       </div>
-      <div style="margin: 8px 0; font-size: 0.9em;">Health: ${
-        player.health
-      }</div>
-      <div style="margin-top: 10px;">${
+      <div class="health-display">Health: ${player.health}</div>
+      <div class="player-stats">
+        <div class="stat-item sabotage-stat" id="sabotage-${index}">
+          <span class="stat-icon">🔧</span>
+          <span class="stat-value">${player.sabotage}</span>
+        </div>
+        <div class="stat-item toxin-stat" id="toxin-${index}">
+          <span class="stat-icon">☠️</span>
+          <span class="stat-value">${player.toxin}</span>
+        </div>
+      </div>
+      <div class="player-status">${
         player.alive
           ? index === gameState.currentPlayerIndex
             ? "🎯 Active Turn"
@@ -117,38 +124,6 @@ function updatePlayers() {
     `;
 
     grid.appendChild(playerDiv);
-  });
-}
-
-// Update Statistics Table
-function updateStatsTable() {
-  const statsGrid = document.getElementById("stats-grid");
-
-  // Clear existing player rows (keep headers)
-  const existingRows = statsGrid.querySelectorAll(".stats-cell");
-  existingRows.forEach((cell) => cell.remove());
-
-  gameState.players.forEach((player, index) => {
-    const isCurrentPlayer =
-      index === gameState.currentPlayerIndex && !gameState.gameOver;
-    const cellClass = `stats-cell ${isCurrentPlayer ? "current-player" : ""} ${
-      !player.alive ? "eliminated" : ""
-    }`;
-
-    // Create cells for each stat (removed speed)
-    const stats = [
-      { value: player.name, class: "player-name-cell" },
-      { value: player.sabotage },
-      { value: player.toxin },
-    ];
-
-    stats.forEach((stat, statIndex) => {
-      const cell = document.createElement("div");
-      cell.className =
-        statIndex === 0 ? `${cellClass} ${stat.class}` : cellClass;
-      cell.textContent = stat.value;
-      statsGrid.appendChild(cell);
-    });
   });
 }
 
@@ -366,21 +341,43 @@ function applyEffectsToPlayer(player, outcome) {
   player.toxin = Math.max(0, player.toxin + outcome.toxin);
 }
 
-// Show Visual Effect Changes
+// Show Visual Effect Changes - UPDATED FOR PLAYER CARDS
 function showEffectChanges(playerIndex, outcome) {
-  const effects = [
-    { stat: "sabotage", value: outcome.sabotage },
-    { stat: "toxin", value: outcome.toxin },
-  ];
+  // Show sabotage changes
+  if (outcome.sabotage !== 0) {
+    showStatChangeInCard(playerIndex, "sabotage", outcome.sabotage);
+  }
 
-  effects.forEach((effect) => {
-    if (effect.value !== 0) {
-      showStatChange(playerIndex, effect.stat, effect.value);
-    }
-  });
+  // Show toxin changes
+  if (outcome.toxin !== 0) {
+    showStatChangeInCard(playerIndex, "toxin", outcome.toxin);
+  }
 
+  // Show health changes
   if (outcome.health !== 0) {
     showHealthChange(playerIndex, outcome.health);
+  }
+}
+
+// NEW: Show stat changes within player cards
+function showStatChangeInCard(playerIndex, statType, change) {
+  const statElement = document.getElementById(`${statType}-${playerIndex}`);
+
+  if (statElement && change !== 0) {
+    const changeElement = document.createElement("div");
+    changeElement.className = `stat-change-card ${
+      change > 0 ? "positive" : "negative"
+    }`;
+    changeElement.textContent = `${change > 0 ? "+" : ""}${change}`;
+
+    statElement.style.position = "relative";
+    statElement.appendChild(changeElement);
+
+    setTimeout(() => {
+      if (changeElement.parentNode) {
+        statElement.removeChild(changeElement);
+      }
+    }, 2000);
   }
 }
 
@@ -669,32 +666,9 @@ function startNewGame() {
   initializeGame();
 }
 
-// Visual Effect Functions
+// LEGACY: Keep for compatibility but now target player cards
 function showStatChange(playerIndex, stat, change) {
-  const statsGrid = document.getElementById("stats-grid");
-  const statIndex = { sabotage: 1, toxin: 2 }[stat];
-  if (!statIndex) return;
-
-  const cellIndex = playerIndex * 3 + statIndex; // 3 columns per player (removed speed)
-  const cells = statsGrid.querySelectorAll(".stats-cell");
-  const targetCell = cells[cellIndex];
-
-  if (targetCell && change !== 0) {
-    const changeElement = document.createElement("div");
-    changeElement.className = `stat-change ${
-      change > 0 ? "positive" : "negative"
-    }`;
-    changeElement.textContent = `${change > 0 ? "+" : ""}${change}`;
-
-    targetCell.style.position = "relative";
-    targetCell.appendChild(changeElement);
-
-    setTimeout(() => {
-      if (changeElement.parentNode) {
-        targetCell.removeChild(changeElement);
-      }
-    }, 2000);
-  }
+  showStatChangeInCard(playerIndex, stat, change);
 }
 
 function showHealthChange(playerIndex, change) {
