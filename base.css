@@ -1,0 +1,276 @@
+/* CSS Variables for Timing Configuration */
+:root {
+  --progress-bar-transition: var(--timing-progress-transition, 0.5s);
+  --quick-bar-animation: var(--timing-quick-bar, 0.3s);
+  --toast-slide-animation: var(--timing-toast-slide, 0.3s);
+  --outcome-modal-animation: var(--timing-outcome-modal, 0.5s);
+  --stat-change-animation: var(--timing-stat-change, 3s);
+  --health-change-animation: var(--timing-health-change, 2s);
+  --card-stat-change-animation: var(--timing-card-stat-change, 2s);
+  --stat-highlight-duration: var(--timing-stat-highlight, 2s);
+}
+
+/* Base Layout and Typography */
+body {
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f0f23);
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.game-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-height: calc(100vh - 40px);
+  width: 95%;
+}
+
+h1 {
+  text-align: center;
+  font-size: clamp(1.5em, 4vw, 2.2em);
+  margin-bottom: 20px;
+  margin-top: 0px;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  color: #ffd93d;
+  font-size: 1.6em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+h3 {
+  color: #ffd93d;
+  font-size: clamp(1.1em, 2.5vw, 1.3em);
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Layout Grids */
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.drinks-container {
+  display: flex;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 15px);
+  margin: 30px 0;
+  flex-wrap: wrap;
+  padding: 0 10px;
+}
+
+/* Basic Button Styles */
+.btn {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  border: none;
+  color: white;
+  padding: clamp(12px, 3vw, 15px) clamp(20px, 5vw, 30px);
+  border-radius: 25px;
+  font-size: clamp(0.9em, 2.5vw, 1.1em);
+  cursor: pointer;
+  margin: 10px;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  min-width: 120px;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  background: linear-gradient(45deg, #666, #777);
+}
+
+.btn.secondary {
+  background: linear-gradient(45deg, #74b9ff, #0984e3);
+  font-size: clamp(0.8em, 2vw, 0.9em);
+  padding: clamp(8px, 2vw, 10px) clamp(16px, 4vw, 20px);
+}
+
+.continue-btn {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  border: none;
+  color: white;
+  padding: 15px 40px;
+  border-radius: 25px;
+  font-size: 1.1em;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Control Center */
+.controls {
+  text-align: center;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+/* Help Button */
+.help-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: clamp(45px, 8vw, 50px);
+  height: clamp(45px, 8vw, 50px);
+  border-radius: 50%;
+  background: linear-gradient(45deg, #74b9ff, #0984e3);
+  border: none;
+  color: white;
+  font-size: clamp(16px, 3vw, 20px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.help-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Winner Announcement */
+.winner-announcement {
+  text-align: center;
+  font-size: clamp(1.5em, 4vw, 2em);
+  color: #4ecdc4;
+  background: rgba(78, 205, 196, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  border: 2px solid #4ecdc4;
+  display: none;
+}
+
+/* Responsive Design */
+
+/* Tablet Breakpoints */
+@media (max-width: 991px) {
+  .game-container {
+    padding: 20px;
+    margin: 10px;
+    width: calc(100% - 20px);
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .drinks-container {
+    gap: 10px;
+    justify-content: center;
+  }
+}
+
+/* Mobile Breakpoints */
+@media (max-width: 767px) {
+  body {
+    padding: 10px;
+  }
+
+  .game-container {
+    padding: 15px;
+    border-radius: 15px;
+    margin: 0;
+    width: 100%;
+    min-height: calc(100vh - 20px);
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .drinks-container {
+    gap: 8px;
+    margin: 20px 0;
+    padding: 0 5px;
+  }
+
+  .controls {
+    margin: 15px 0;
+    padding: 0 10px;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    padding: 15px 20px;
+  }
+
+  .help-btn {
+    bottom: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+  }
+}
+
+/* Large Desktop Optimization */
+@media (min-width: 1400px) {
+  .game-container {
+    max-width: 1600px;
+    padding: 40px;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+  }
+
+  .drinks-container {
+    gap: 20px;
+  }
+}
+
+/* Ultra-wide Support */
+@media (min-width: 1920px) {
+  .game-container {
+    max-width: 1800px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .btn:hover {
+    transform: none;
+  }
+
+  .help-btn:hover {
+    transform: none;
+  }
+
+  .btn {
+    min-height: 50px;
+  }
+}

@@ -1,127 +1,16 @@
-// Poison Roulette Game Logic
+// Poison Roulette Game - UI Updates and Display Functions
 
-// Game State
-let gameState = {
-  players: [],
-  currentPlayerIndex: 0,
-  round: 1,
-  drinks: [],
-  selectedDrink: null,
-  gameOver: false,
-  phase: "drinking",
-  turnOrder: [],
-};
-
-// Initialize Game
-function initializeGame() {
-  // Apply timing configuration to CSS
-  applyTimingConfigToCSS();
-
-  // Reset game state with configuration
-  gameState = {
-    players: JSON.parse(JSON.stringify(DEFAULT_PLAYERS)), // Deep copy
-    currentPlayerIndex: 0,
-    round: 1,
-    drinks: [],
-    selectedDrink: null,
-    gameOver: false,
-    phase: "drinking",
-    turnOrder: [],
-  };
-
-  generateDrinks();
+// Update All Display Elements
+function updateDisplay() {
+  updatePlayers();
+  updateDrinks();
+  updateControls();
   updateTurnOrder();
-  updateDisplay();
-  startDrinkingPhase();
-
-  // Only show initial game message
-  showToast(GAME_MESSAGES.gameStart);
+  updateGameProgress();
+  updateQuickActionBar();
 }
 
-// Apply timing configuration to CSS custom properties
-function applyTimingConfigToCSS() {
-  const root = document.documentElement;
-
-  // Convert timing values to CSS custom properties
-  root.style.setProperty(
-    "--timing-progress-transition",
-    `${TIMING_CONFIG.progressBarTransition}ms`
-  );
-  root.style.setProperty(
-    "--timing-quick-bar",
-    `${TIMING_CONFIG.quickBarAnimation}ms`
-  );
-  root.style.setProperty(
-    "--timing-toast-slide",
-    `${TIMING_CONFIG.toastSlideAnimation}ms`
-  );
-  root.style.setProperty(
-    "--timing-outcome-modal",
-    `${TIMING_CONFIG.outcomeModalAnimation}ms`
-  );
-  root.style.setProperty(
-    "--timing-stat-change",
-    `${TIMING_CONFIG.statChangeAnimation}ms`
-  );
-  root.style.setProperty(
-    "--timing-health-change",
-    `${TIMING_CONFIG.healthChangeAnimation}ms`
-  );
-  root.style.setProperty(
-    "--timing-card-stat-change",
-    `${TIMING_CONFIG.cardStatChangeAnimation}ms`
-  );
-  root.style.setProperty(
-    "--timing-stat-highlight",
-    `${TIMING_CONFIG.statHighlightDuration}ms`
-  );
-}
-
-// Generate Drinks for Current Round - UPDATED FOR ROUND-BASED SYSTEM
-function generateDrinks() {
-  gameState.drinks = [];
-
-  // Always generate 6 drinks per round
-  const numDrinks = GAME_CONFIG.firstRoundDrinks;
-  const availableColors = getAvailableDrinkColors(gameState.round);
-
-  for (let i = 0; i < numDrinks; i++) {
-    const color =
-      availableColors[Math.floor(Math.random() * availableColors.length)];
-
-    // NEW: Pre-resolve the drink outcome when created (for analyze action)
-    const possibleOutcomes = DRINK_EFFECTS[color].outcomes;
-    const resolvedOutcome = getRandomOutcome({ outcomes: possibleOutcomes });
-
-    gameState.drinks.push({
-      id: gameState.drinks.length,
-      color: color,
-      name: DRINK_EFFECTS[color].name,
-      consumed: false,
-      neutralized: false,
-      spiked: false,
-      analyzed: false,
-      effects: null,
-      poisoned: false,
-      poisonAmount: 0,
-      // NEW: Store the pre-resolved outcome for actions
-      resolvedOutcome: resolvedOutcome,
-    });
-  }
-}
-
-// Update Turn Order Based on Round-Robin
-function updateTurnOrder() {
-  // Simple round-robin system - no speed-based ordering
-  const alivePlayers = gameState.players.filter((p) => p.alive);
-  const currentPlayerName =
-    alivePlayers.length > 0
-      ? gameState.players[gameState.currentPlayerIndex]?.name ||
-        alivePlayers[0].name
-      : "None";
-}
-
-// UPDATE: Game Progress Display with corrected drinks count
+// Game Progress Display with corrected drinks count
 function updateGameProgress() {
   const roundDisplay = document.getElementById("current-round");
   const drinksCountDisplay = document.getElementById("drinks-count");
@@ -142,7 +31,7 @@ function updateGameProgress() {
   }
 }
 
-// UPDATE: Quick Action Bar with round-based actions and tooltips
+// Quick Action Bar with round-based actions and tooltips
 function updateQuickActionBar() {
   const quickBar = document.getElementById("action-quick-bar");
   const quickActions = document.getElementById("quick-actions");
@@ -171,7 +60,7 @@ function updateQuickActionBar() {
       deadly_poison: "💀",
     };
 
-    // NEW: Get available actions for current round
+    // Get available actions for current round
     const availableActionIds = getAvailableActions(gameState.round);
     const availableActions = ACTIONS.filter((action) =>
       availableActionIds.includes(action.id)
@@ -194,7 +83,7 @@ function updateQuickActionBar() {
         };
       }
 
-      // NEW: Add enhanced tooltip
+      // Add enhanced tooltip
       button.title = action.tooltip;
 
       quickActions.appendChild(button);
@@ -204,17 +93,7 @@ function updateQuickActionBar() {
   }
 }
 
-// Update All Display Elements
-function updateDisplay() {
-  updatePlayers();
-  updateDrinks();
-  updateControls();
-  updateTurnOrder();
-  updateGameProgress();
-  updateQuickActionBar();
-}
-
-// UPDATE: Player Display with Health Division by 10
+// Player Display with Health Division by 10
 function updatePlayers() {
   const grid = document.getElementById("players-grid");
   grid.innerHTML = "";
@@ -228,7 +107,7 @@ function updatePlayers() {
       playerDiv.classList.add("current-turn");
     }
 
-    // NEW: Health display divided by 10
+    // Health display divided by 10
     const displayHealth = getDisplayHealth(player.health);
     const healthPercentage = Math.max(0, Math.min(100, player.health));
 
@@ -255,7 +134,7 @@ function updatePlayers() {
   });
 }
 
-// UPDATE: Drinks Display with Most Likely Icons
+// Drinks Display with Most Likely Icons
 function updateDrinks() {
   const container = document.getElementById("drinks-container");
   container.innerHTML = "";
@@ -271,7 +150,7 @@ function updateDrinks() {
       drinkDiv.className = classes;
       drinkDiv.onclick = () => selectDrink(drink.id);
 
-      // NEW: Add most likely outcome icon
+      // Add most likely outcome icon
       const mostLikelyIcon = document.createElement("div");
       mostLikelyIcon.className = "drink-likely-icon";
       mostLikelyIcon.textContent = DRINK_EFFECTS[drink.color].mostLikelyIcon;
@@ -283,7 +162,7 @@ function updateDrinks() {
       let tooltipContent = `<div class="tooltip-header"><strong>${drink.name}</strong></div>`;
 
       if (drink.analyzed) {
-        // NEW: Show actual resolved outcome for analyzed drinks
+        // Show actual resolved outcome for analyzed drinks
         tooltipContent +=
           '<div class="tooltip-analyzed">ANALYZED - Actual outcome:</div>';
         tooltipContent += '<div class="tooltip-effects">';
@@ -374,93 +253,6 @@ function updateControls() {
   newGameBtn.style.display = gameState.gameOver ? "inline-block" : "none";
 }
 
-// Select a Drink
-function selectDrink(drinkId) {
-  if (gameState.gameOver) return;
-  gameState.selectedDrink = drinkId;
-  updateDisplay();
-}
-
-// Drink Selection Handler
-function drinkSelected() {
-  if (gameState.selectedDrink === null || gameState.gameOver) return;
-
-  const drink = gameState.drinks.find((d) => d.id === gameState.selectedDrink);
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-
-  processDrink(currentPlayer, drink);
-
-  // Only proceed to next turn if it's not a human player (human waits for modal close)
-  if (!currentPlayer.isHuman) {
-    nextTurn();
-  }
-}
-
-// UPDATE: Process Drinking with Pre-resolved Outcomes
-function processDrink(player, drink) {
-  drink.consumed = true;
-
-  let outcome;
-  if (drink.neutralized) {
-    outcome = ACTION_EFFECTS.neutralize;
-  } else {
-    // NEW: Use pre-resolved outcome instead of random generation
-    outcome = drink.resolvedOutcome;
-
-    if (drink.spiked) {
-      outcome = {
-        ...outcome,
-        health: outcome.health - ACTION_EFFECTS.spike.additionalDamage,
-      };
-    }
-    if (drink.poisoned) {
-      outcome = { ...outcome, toxin: outcome.toxin + drink.poisonAmount };
-    }
-  }
-
-  // Apply effects to player
-  applyEffectsToPlayer(player, outcome);
-
-  // Handle health stealing
-  if (outcome.steal) {
-    gameState.players.forEach((p) => {
-      if (p !== player && p.alive) {
-        const stolenHealth = Math.min(outcome.steal, p.health);
-        p.health = Math.max(0, p.health - stolenHealth);
-        player.health = Math.min(100, player.health + stolenHealth);
-      }
-    });
-  }
-
-  // Check if player died
-  if (player.health <= 0) {
-    player.alive = false;
-  }
-
-  // Show visual feedback
-  const playerIndex = gameState.players.indexOf(player);
-  showEffectChanges(playerIndex, outcome);
-
-  // Show outcome modal for human player, then proceed to next turn
-  if (player.isHuman) {
-    setTimeout(() => {
-      showDrinkOutcome(player, drink, outcome);
-    }, TIMING_CONFIG.drinkOutcomeDelay);
-  } else {
-    // For AI players, update display and continue with proper timing
-    updateDisplay();
-    gameState.selectedDrink = null;
-    // REMOVED: Turn summary popup for AI players - visual feedback is sufficient
-  }
-}
-
-// Apply Effects to Player Stats
-function applyEffectsToPlayer(player, outcome) {
-  player.health = Math.max(0, Math.min(100, player.health + outcome.health));
-  player.sabotage = Math.max(0, player.sabotage + outcome.sabotage);
-  player.toxin = Math.max(0, player.toxin + outcome.toxin);
-}
-
 // Show Visual Effect Changes - ENHANCED VERSION
 function showEffectChanges(playerIndex, outcome) {
   const player = gameState.players[playerIndex];
@@ -488,12 +280,12 @@ function showEffectChanges(playerIndex, outcome) {
       }, TIMING_CONFIG.statUpdateDelay * 2);
     }
 
-    // Store changes for later use (no longer used for AI turn summary)
+    // Store changes for later use
     player._lastTurnChanges = changes;
   }, TIMING_CONFIG.effectFeedbackDelay);
 }
 
-// NEW: Enhanced stat changes with improved animations
+// Enhanced stat changes with improved animations
 function showEnhancedStatChange(playerIndex, statType, change) {
   const statElement = document.getElementById(`${statType}-${playerIndex}`);
 
@@ -522,7 +314,7 @@ function showEnhancedStatChange(playerIndex, statType, change) {
   }
 }
 
-// NEW: Enhanced health change animation
+// Enhanced health change animation
 function showEnhancedHealthChange(playerIndex, change) {
   const playerCard = document.getElementById(`player-${playerIndex}`);
   const healthBar = playerCard?.querySelector(".health-bar");
@@ -555,305 +347,7 @@ function showEnhancedHealthChange(playerIndex, change) {
   }
 }
 
-// Get Random Outcome Based on Probabilities
-function getRandomOutcome(drinkEffect) {
-  const random = Math.random() * 100;
-  let cumulative = 0;
-
-  for (const outcome of drinkEffect.outcomes) {
-    cumulative += outcome.chance;
-    if (random <= cumulative) {
-      return outcome;
-    }
-  }
-  return drinkEffect.outcomes[0];
-}
-
-// NEW: Get Effects Text for Display with Health Division
-function getEffectsText(effect) {
-  const effects = [];
-  if (effect.health !== 0) {
-    const displayHealth = getDisplayHealth(Math.abs(effect.health));
-    effects.push(`${effect.health > 0 ? "+" : "-"}${displayHealth}❤️`);
-  }
-  if (effect.sabotage !== 0)
-    effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
-  if (effect.toxin !== 0)
-    effects.push(`${effect.toxin > 0 ? "+" : ""}${effect.toxin}☠️`);
-  if (effect.steal) effects.push(`Steal ${getDisplayHealth(effect.steal)}❤️`);
-  return effects.join(" ");
-}
-
-// UPDATE: Action Modal with Round-based Actions and Tooltips
-function openActionModal() {
-  if (gameState.selectedDrink === null) return;
-
-  const modal = document.getElementById("action-modal");
-  const actionButtons = document.getElementById("action-buttons");
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-
-  actionButtons.innerHTML = "";
-
-  // NEW: Get available actions for current round
-  const availableActionIds = getAvailableActions(gameState.round);
-  const availableActions = ACTIONS.filter((action) =>
-    availableActionIds.includes(action.id)
-  );
-
-  availableActions.forEach((action) => {
-    const button = document.createElement("button");
-    button.className = "action-btn";
-    button.innerHTML = `<strong>${action.name}</strong><br>${action.cost} 🔧<br><small>${action.description}</small>`;
-    button.disabled = currentPlayer.sabotage < action.cost;
-    button.onclick = () => {
-      performAction(action.id);
-      closeActionModal();
-    };
-
-    // NEW: Add tooltip
-    button.title = action.tooltip;
-
-    actionButtons.appendChild(button);
-  });
-
-  modal.style.display = "block";
-}
-
-function closeActionModal() {
-  document.getElementById("action-modal").style.display = "none";
-}
-
-// UPDATE: Perform Action with New Resolution System
-function performAction(actionId) {
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  const action = ACTIONS.find((a) => a.id === actionId);
-  const drink = gameState.drinks.find((d) => d.id === gameState.selectedDrink);
-
-  if (!drink || currentPlayer.sabotage < action.cost) return;
-
-  currentPlayer.sabotage -= action.cost;
-
-  switch (actionId) {
-    case "duplicate":
-      const newDrink = {
-        ...drink,
-        id: gameState.drinks.length,
-        // NEW: Duplicate also gets a new resolved outcome
-        resolvedOutcome: getRandomOutcome(DRINK_EFFECTS[drink.color]),
-      };
-      gameState.drinks.push(newDrink);
-      break;
-
-    case "neutralize":
-      drink.neutralized = true;
-      break;
-
-    case "eliminate":
-      drink.consumed = true;
-      break;
-
-    case "analyze":
-      drink.analyzed = true;
-      // NOTE: The resolved outcome is already stored, so analyze just reveals it
-      break;
-
-    case "spike":
-      drink.spiked = true;
-      break;
-
-    case "poison":
-      drink.poisoned = true;
-      drink.poisonAmount = ACTION_EFFECTS.poison.additionalToxin;
-      break;
-
-    case "deadly_poison":
-      drink.poisoned = true;
-      drink.poisonAmount = ACTION_EFFECTS.deadly_poison.additionalToxin;
-      break;
-  }
-
-  // Show sabotage cost being spent with timing
-  setTimeout(() => {
-    showEnhancedStatChange(
-      gameState.players.indexOf(currentPlayer),
-      "sabotage",
-      -action.cost
-    );
-  }, TIMING_CONFIG.actionFeedbackDelay);
-
-  gameState.selectedDrink = null;
-
-  // Update display to hide quick bar and cost indicators
-  updateDisplay();
-
-  setTimeout(() => {
-    nextTurn();
-  }, TIMING_CONFIG.turnTransitionDelay);
-}
-
-// Turn Management
-function nextTurn() {
-  // Apply toxin damage at end of turn
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  if (currentPlayer.toxin > 0) {
-    const toxinDamage = Math.floor(currentPlayer.toxin / 2);
-    currentPlayer.health = Math.max(0, currentPlayer.health - toxinDamage);
-    currentPlayer.toxin = Math.max(
-      0,
-      currentPlayer.toxin - GAME_CONFIG.toxinDecayRate
-    );
-
-    if (toxinDamage > 0 && currentPlayer.health <= 0) {
-      currentPlayer.alive = false;
-    }
-  }
-
-  // Check win condition
-  const alivePlayers = gameState.players.filter((p) => p.alive);
-  if (alivePlayers.length <= 1) {
-    endGame();
-    return;
-  }
-
-  // Check if we need to start a new round (no drinks left)
-  const remainingDrinks = gameState.drinks.filter((d) => !d.consumed);
-  if (remainingDrinks.length === 0) {
-    // Start new round
-    gameState.round++;
-    generateDrinks();
-
-    // Reset to first alive player for new round
-    const firstAliveIndex = gameState.players.findIndex((p) => p.alive);
-    gameState.currentPlayerIndex = firstAliveIndex >= 0 ? firstAliveIndex : 0;
-  } else {
-    // Find next player in current round
-    let nextIndex = findNextPlayerIndex();
-    if (nextIndex !== -1) {
-      gameState.currentPlayerIndex = nextIndex;
-    }
-  }
-
-  updateDisplay();
-
-  if (!gameState.players[gameState.currentPlayerIndex].isHuman) {
-    setTimeout(aiTurn, TIMING_CONFIG.aiTurnDelay);
-  }
-}
-
-// Remove the unused functions that were causing issues
-function findNextPlayerIndex() {
-  const alivePlayers = gameState.players.filter((p) => p.alive);
-  if (alivePlayers.length === 0) return -1;
-
-  let nextIndex = gameState.currentPlayerIndex;
-  do {
-    nextIndex = (nextIndex + 1) % gameState.players.length;
-  } while (
-    !gameState.players[nextIndex].alive &&
-    nextIndex !== gameState.currentPlayerIndex
-  );
-
-  return gameState.players[nextIndex].alive ? nextIndex : -1;
-}
-
-// UPDATE: AI Turn Logic with Round-based Actions
-function aiTurn() {
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  if (!currentPlayer.alive || gameState.gameOver) return;
-
-  const availableDrinks = gameState.drinks.filter((d) => !d.consumed);
-  if (availableDrinks.length === 0) {
-    // No drinks left, trigger new round
-    nextTurn();
-    return;
-  }
-
-  // AI decides whether to use action or drink
-  const availableActionIds = getAvailableActions(gameState.round);
-  const availableActions = ACTIONS.filter((action) =>
-    availableActionIds.includes(action.id)
-  );
-  const hasActionPoints = currentPlayer.sabotage >= 2;
-  const shouldUseAction =
-    hasActionPoints &&
-    availableActions.length > 0 &&
-    Math.random() < AI_CONFIG.actionUseChance;
-
-  const randomDrink =
-    availableDrinks[Math.floor(Math.random() * availableDrinks.length)];
-  gameState.selectedDrink = randomDrink.id;
-
-  if (shouldUseAction) {
-    // Use random action from available actions
-    const affordableActions = availableActions.filter(
-      (a) => currentPlayer.sabotage >= a.cost
-    );
-    if (affordableActions.length > 0) {
-      const chosenAction =
-        affordableActions[Math.floor(Math.random() * affordableActions.length)];
-      performAction(chosenAction.id);
-      return;
-    }
-  }
-
-  // Just drink
-  processDrink(currentPlayer, randomDrink);
-  setTimeout(nextTurn, TIMING_CONFIG.aiDrinkDelay);
-}
-
-// Game Flow Functions
-function startDrinkingPhase() {
-  gameState.phase = "drinking";
-
-  // Find first alive player
-  const firstAliveIndex = gameState.players.findIndex((p) => p.alive);
-  gameState.currentPlayerIndex = firstAliveIndex >= 0 ? firstAliveIndex : 0;
-
-  updateDisplay();
-
-  if (!gameState.players[gameState.currentPlayerIndex].isHuman) {
-    setTimeout(aiTurn, TIMING_CONFIG.roundTransitionDelay);
-  }
-}
-
-function endGame() {
-  gameState.gameOver = true;
-  const alivePlayers = gameState.players.filter((p) => p.alive);
-  const winnerDiv = document.getElementById("winner-announcement");
-  const winnerText = document.getElementById("winner-text");
-
-  if (alivePlayers.length === 1) {
-    winnerText.textContent = `🏆 ${alivePlayers[0].name} WINS! 🏆`;
-  } else {
-    winnerText.textContent = "💀 Total Elimination! 💀";
-  }
-
-  winnerDiv.style.display = "block";
-  winnerDiv.classList.add("pulse");
-  updateDisplay();
-}
-
-function startNewGame() {
-  document.getElementById("winner-announcement").style.display = "none";
-  closeHelpModal();
-
-  // Clear any existing toasts
-  const toastContainer = document.getElementById("toast-container");
-  toastContainer.innerHTML = "";
-
-  initializeGame();
-}
-
-// LEGACY: Keep for compatibility but now redirect to enhanced versions
-function showStatChange(playerIndex, stat, change) {
-  showEnhancedStatChange(playerIndex, stat, change);
-}
-
-function showHealthChange(playerIndex, change) {
-  showEnhancedHealthChange(playerIndex, change);
-}
-
-// NEW: Keep legacy function for card-based changes (still used in some places)
+// Keep legacy function for card-based changes (still used in some places)
 function showStatChangeInCard(playerIndex, statType, change) {
   const statElement = document.getElementById(`${statType}-${playerIndex}`);
 
@@ -875,7 +369,16 @@ function showStatChangeInCard(playerIndex, statType, change) {
   }
 }
 
-// UPDATE: Drink Outcome Modal with Health Division
+// LEGACY: Keep for compatibility but now redirect to enhanced versions
+function showStatChange(playerIndex, stat, change) {
+  showEnhancedStatChange(playerIndex, stat, change);
+}
+
+function showHealthChange(playerIndex, change) {
+  showEnhancedHealthChange(playerIndex, change);
+}
+
+// Drink Outcome Modal with Health Division
 function showDrinkOutcome(player, drink, outcome) {
   const modal = document.getElementById("outcome-modal");
   const content = document.getElementById("outcome-content");
@@ -947,6 +450,20 @@ function closeOutcomeModal() {
   nextTurn();
 }
 
+// How to Play Modal Functions
+function showHowToPlayModal() {
+  document.getElementById("how-to-play-modal").style.display = "block";
+}
+
+function closeHowToPlayModal() {
+  document.getElementById("how-to-play-modal").style.display = "none";
+
+  // Show initial game message after closing How to Play
+  setTimeout(() => {
+    showToast(GAME_MESSAGES.gameStart);
+  }, 500);
+}
+
 // Help Modal Functions
 function openHelpModal() {
   // Populate help text from config with display health
@@ -1012,25 +529,3 @@ function showToast(message, type = "") {
 function logMessage(message, className = "") {
   showToast(message, className);
 }
-
-// Event Handlers
-window.onclick = function (event) {
-  const actionModal = document.getElementById("action-modal");
-  const helpModal = document.getElementById("help-modal");
-  const outcomeModal = document.getElementById("outcome-modal");
-
-  if (event.target === actionModal) {
-    closeActionModal();
-  }
-  if (event.target === helpModal) {
-    closeHelpModal();
-  }
-  if (event.target === outcomeModal) {
-    closeOutcomeModal();
-  }
-};
-
-// Initialize the game when page loads
-document.addEventListener("DOMContentLoaded", function () {
-  initializeGame();
-});

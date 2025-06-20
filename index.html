@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Poison Roulette - Multi-Stat Edition</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="stylesheet" href="components.css" />
+    <link rel="stylesheet" href="animations.css" />
   </head>
   <body>
     <div class="game-container">
@@ -70,6 +72,78 @@
 
       <div class="toast-container" id="toast-container">
         <!-- Toast notifications will appear here -->
+      </div>
+
+      <!-- How to Play Modal (shown at game start) -->
+      <div id="how-to-play-modal" class="modal" style="display: none">
+        <div class="modal-content how-to-play-content">
+          <span class="close" onclick="closeHowToPlayModal()">&times;</span>
+          <h2>🎮 How to Play Poison Roulette</h2>
+
+          <div class="how-to-play-section">
+            <h3>🎯 The Goal</h3>
+            <p>
+              <strong>Survive by being the last player standing!</strong> Manage
+              your health while outsmarting your opponents with strategic
+              sabotage.
+            </p>
+          </div>
+
+          <div class="how-to-play-section">
+            <h3 class="stat-icon-stats">📊 Your Stats</h3>
+            <div class="stats-explanation">
+              <div class="stat-explain">
+                <span class="stat-icon">❤️</span>
+                <div>
+                  <strong>Health:</strong> Keep this above 0 or you're out!
+                </div>
+              </div>
+              <div class="stat-explain">
+                <span class="stat-icon">🔧</span>
+                <div>
+                  <strong>Sabotage:</strong> Spend these points to mess with
+                  drinks
+                </div>
+              </div>
+              <div class="stat-explain">
+                <span class="stat-icon">☠️</span>
+                <div>
+                  <strong>Toxin:</strong> Poison that damages you each turn
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="how-to-play-section">
+            <h3>🥤 How to Play</h3>
+            <div class="gameplay-flow">
+              <div class="flow-step">
+                <strong>1. Pick a Drink</strong><br />
+                Click on any available potion
+              </div>
+              <div class="flow-step">
+                <strong>2. Sabotage (Optional)</strong><br />
+                Use your 🔧 points to modify it
+              </div>
+              <div class="flow-step">
+                <strong>3. Drink & Survive</strong><br />
+                Face the consequences!
+              </div>
+            </div>
+          </div>
+
+          <div class="how-to-play-footer">
+            <button class="btn" onclick="closeHowToPlayModal()">
+              Ready to Survive! 🍻
+            </button>
+            <p>
+              <small
+                >💡 Hover over drinks and use the <strong>?</strong> button for
+                detailed info</small
+              >
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Drink Outcome Modal -->
@@ -160,6 +234,8 @@
 
     <!-- Load game configuration and logic -->
     <script src="config.js"></script>
-    <script src="game.js"></script>
+    <script src="game-core.js"></script>
+    <script src="game-ui.js"></script>
+    <script src="game-actions.js"></script>
   </body>
 </html>
