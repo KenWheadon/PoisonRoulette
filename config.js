@@ -1,238 +1,74 @@
-// Poison Roulette Game Configuration
-
-// Game Settings
+// Core Game Settings
 const GAME_CONFIG = {
-  // Player Configuration
   initialHealth: 100,
-  initialStats: {
-    sabotage: 1, // Not enough for any action - forces first turn drinking
-    toxin: 0,
-  },
-
-  // Game Flow
+  initialSabotage: 1,
+  initialToxin: 0,
   firstRoundDrinks: 8,
   subsequentRoundDrinks: 10,
-
-  // Damage and Effects
-  toxinDecayRate: 2, // Increased decay to prevent death spiral
-
-  // Toast Duration
-  toastDuration: 4000, // milliseconds
+  toxinDecayRate: 2,
+  toastDuration: 4000,
 };
 
-// Default Player Setup
-const DEFAULT_PLAYERS = [
-  {
-    name: "You",
-    health: GAME_CONFIG.initialHealth,
-    ...GAME_CONFIG.initialStats,
-    alive: true,
-    isHuman: true,
+// Action System
+const ACTION_CONFIG = {
+  costs: {
+    duplicate: 4,
+    neutralize: 3,
+    eliminate: 3,
+    analyze: 2,
+    spike: 4,
+    poison: 5,
+    deadly_poison: 10,
   },
-  {
-    name: "AI Alpha",
-    health: GAME_CONFIG.initialHealth,
-    ...GAME_CONFIG.initialStats,
-    alive: true,
-    isHuman: false,
+  effects: {
+    neutralizeHealing: 5,
+    spikeExtraDamage: 15,
+    poisonExtraToxin: 3,
+    deadlyPoisonExtraToxin: 10,
   },
-  {
-    name: "AI Beta",
-    health: GAME_CONFIG.initialHealth,
-    ...GAME_CONFIG.initialStats,
-    alive: true,
-    isHuman: false,
-  },
-  {
-    name: "AI Gamma",
-    health: GAME_CONFIG.initialHealth,
-    ...GAME_CONFIG.initialStats,
-    alive: true,
-    isHuman: false,
-  },
-];
+};
 
-// Drink Effects Configuration
-const DRINK_EFFECTS = {
+// Potion Balance Data - Single Source of Truth
+const POTION_DATA = {
   blue: {
     name: "Blue Elixir",
-    outcomes: [
-      {
-        chance: 100,
-        health: 8,
-        sabotage: 0,
-        toxin: 2,
-        description: "Safe healing, builds toxin",
-      },
-    ],
+    heal: { chance: 40, amount: 15 },
+    sabotage: { chance: 40, amount: 2 },
+    toxin: { chance: 20, amount: 4 },
   },
   green: {
     name: "Green Brew",
-    outcomes: [
-      {
-        chance: 70,
-        health: 18,
-        sabotage: 1,
-        toxin: 1,
-        description: "Beneficial with minor toxin",
-      },
-      {
-        chance: 30,
-        health: -5,
-        sabotage: 3,
-        toxin: 3,
-        description: "Bitter taste, harsh lesson",
-      },
-    ],
+    heal: { chance: 30, amount: 20 },
+    sabotage: { chance: 50, amount: 4 },
+    damage: { chance: 20, amount: 25 },
   },
   yellow: {
     name: "Yellow Mixture",
-    outcomes: [
-      {
-        chance: 50,
-        health: 25,
-        sabotage: 0,
-        toxin: 1,
-        description: "Lucky fortune!",
-      },
-      {
-        chance: 50,
-        health: -8,
-        sabotage: 4,
-        toxin: 2,
-        description: "Painful but profitable lesson",
-      },
-    ],
+    heal: { chance: 40, amount: 25 },
+    sabotage: { chance: 20, amount: 3 },
+    toxin: { chance: 40, amount: 5 },
   },
   red: {
     name: "Red Potion",
-    outcomes: [
-      {
-        chance: 30,
-        health: 30,
-        sabotage: 1,
-        toxin: 0,
-        description: "Heroic surge of power!",
-      },
-      {
-        chance: 70,
-        health: -25,
-        sabotage: 6,
-        toxin: 1,
-        description: "Brutal but empowering",
-      },
-    ],
+    heal: { chance: 20, amount: 30 },
+    sabotage: { chance: 30, amount: 6 },
+    damage: { chance: 50, amount: 40 },
   },
   purple: {
     name: "Purple Draught",
-    outcomes: [
-      {
-        chance: 25,
-        health: 40,
-        sabotage: 2,
-        toxin: 0,
-        description: "Mystical power surge!",
-      },
-      {
-        chance: 75,
-        health: -30,
-        sabotage: 10,
-        toxin: 1,
-        description: "Devastating but profitable",
-      },
-    ],
+    heal: { chance: 15, amount: 45 },
+    sabotage: { chance: 25, amount: 8 },
+    toxin: { chance: 60, amount: 8 },
   },
   black: {
     name: "Black Essence",
-    outcomes: [
-      {
-        chance: 20,
-        health: 50,
-        sabotage: 3,
-        toxin: 0,
-        description: "ULTIMATE POWER!",
-        steal: 15,
-      },
-      {
-        chance: 80,
-        health: -40,
-        sabotage: 15,
-        toxin: 0,
-        description: "Near death, massive power",
-      },
-    ],
+    heal: { chance: 10, amount: 60, steal: 15 },
+    sabotage: { chance: 20, amount: 10 },
+    damage: { chance: 70, amount: 50 },
   },
 };
 
-// Available Actions Configuration
-const ACTIONS = [
-  {
-    id: "duplicate",
-    name: "Duplicate",
-    cost: 4,
-    description: "Create a copy of selected drink",
-  },
-  {
-    id: "neutralize",
-    name: "Neutralize",
-    cost: 3,
-    description: "Make drink give +5 health only",
-  },
-  {
-    id: "eliminate",
-    name: "Eliminate",
-    cost: 3,
-    description: "Remove drink from play",
-  },
-  {
-    id: "analyze",
-    name: "Analyze",
-    cost: 2,
-    description: "Reveal exact effects of drink",
-  },
-  {
-    id: "spike",
-    name: "Spike",
-    cost: 4,
-    description: "Add +15 damage to drink",
-  },
-  {
-    id: "poison",
-    name: "Poison",
-    cost: 5,
-    description: "Add +3 toxin to drink",
-  },
-  {
-    id: "deadly_poison",
-    name: "Deadly Poison",
-    cost: 10,
-    description: "Add +10 toxin to drink",
-  },
-];
-
-// Drink Color Options
-const DRINK_COLORS = ["blue", "green", "yellow", "red", "purple", "black"];
-
-// Action Costs and Effects
-const ACTION_EFFECTS = {
-  neutralize: {
-    health: 5,
-    sabotage: 0,
-    toxin: 0,
-    description: "Neutralized - safe",
-  },
-  spike: {
-    additionalDamage: 15,
-  },
-  poison: {
-    additionalToxin: 3,
-  },
-  deadly_poison: {
-    additionalToxin: 10,
-  },
-};
-
-// AI Behavior Configuration
+// AI Behavior
 const AI_CONFIG = {
   actionUseChance: 0.25,
   drinkSelectionStrategy: "smart",
@@ -241,55 +77,188 @@ const AI_CONFIG = {
   savePointsChance: 0.4,
 };
 
-// DYNAMIC TOOLTIP GENERATION - Auto-generates from DRINK_EFFECTS
-// This function creates tooltip text from the actual config values
-function generateDrinkTooltipText(color) {
-  const drinkEffect = DRINK_EFFECTS[color];
-  if (!drinkEffect) return "Unknown drink";
+// Generated Configurations (built from above data)
+const DEFAULT_PLAYERS = [
+  {
+    name: "You",
+    health: GAME_CONFIG.initialHealth,
+    sabotage: GAME_CONFIG.initialSabotage,
+    toxin: GAME_CONFIG.initialToxin,
+    alive: true,
+    isHuman: true,
+  },
+  {
+    name: "AI Alpha",
+    health: GAME_CONFIG.initialHealth,
+    sabotage: GAME_CONFIG.initialSabotage,
+    toxin: GAME_CONFIG.initialToxin,
+    alive: true,
+    isHuman: false,
+  },
+  {
+    name: "AI Beta",
+    health: GAME_CONFIG.initialHealth,
+    sabotage: GAME_CONFIG.initialSabotage,
+    toxin: GAME_CONFIG.initialToxin,
+    alive: true,
+    isHuman: false,
+  },
+  {
+    name: "AI Gamma",
+    health: GAME_CONFIG.initialHealth,
+    sabotage: GAME_CONFIG.initialSabotage,
+    toxin: GAME_CONFIG.initialToxin,
+    alive: true,
+    isHuman: false,
+  },
+];
 
-  const outcomes = drinkEffect.outcomes;
-  const tooltipParts = [];
+// Generate drink effects from potion data
+const DRINK_EFFECTS = {};
+Object.keys(POTION_DATA).forEach((color) => {
+  const data = POTION_DATA[color];
+  DRINK_EFFECTS[color] = {
+    name: data.name,
+    outcomes: [],
+  };
 
-  outcomes.forEach((outcome) => {
-    const effects = [];
+  // Add heal outcome
+  if (data.heal) {
+    DRINK_EFFECTS[color].outcomes.push({
+      chance: data.heal.chance,
+      health: data.heal.amount,
+      sabotage: 0,
+      toxin: 0,
+      description: `Healing: +${data.heal.amount} health`,
+      ...(data.heal.steal && { steal: data.heal.steal }),
+    });
+  }
 
-    // Add health effect if not zero
-    if (outcome.health !== 0) {
-      effects.push(`${outcome.health > 0 ? "+" : ""}${outcome.health}❤️`);
-    }
+  // Add sabotage outcome
+  if (data.sabotage) {
+    DRINK_EFFECTS[color].outcomes.push({
+      chance: data.sabotage.chance,
+      health: 0,
+      sabotage: data.sabotage.amount,
+      toxin: 0,
+      description: `Sabotage: +${data.sabotage.amount} action points`,
+    });
+  }
 
-    // Add sabotage effect if not zero
-    if (outcome.sabotage !== 0) {
-      effects.push(`${outcome.sabotage > 0 ? "+" : ""}${outcome.sabotage}🔧`);
-    }
+  // Add damage outcome
+  if (data.damage) {
+    DRINK_EFFECTS[color].outcomes.push({
+      chance: data.damage.chance,
+      health: -data.damage.amount,
+      sabotage: 0,
+      toxin: 0,
+      description: `Damage: -${data.damage.amount} health`,
+    });
+  }
 
-    // Add toxin effect if not zero
-    if (outcome.toxin !== 0) {
-      effects.push(`${outcome.toxin > 0 ? "+" : ""}${outcome.toxin}☠️`);
-    }
-
-    // Add steal effect if present
-    if (outcome.steal) {
-      effects.push(`steal ${outcome.steal}❤️`);
-    }
-
-    // Create the outcome string
-    const effectsText = effects.length > 0 ? `(${effects.join(" ")})` : "";
-    tooltipParts.push(`${outcome.chance}% ${effectsText}`);
-  });
-
-  return tooltipParts.join(", ");
-}
-
-// DYNAMIC PROBABILITY TEXT - Generated from actual config
-const DRINK_PROBABILITY_TEXT = {};
-
-// Auto-populate the probability text from config
-DRINK_COLORS.forEach((color) => {
-  DRINK_PROBABILITY_TEXT[color] = generateDrinkTooltipText(color);
+  // Add toxin outcome
+  if (data.toxin) {
+    DRINK_EFFECTS[color].outcomes.push({
+      chance: data.toxin.chance,
+      health: 0,
+      sabotage: 0,
+      toxin: data.toxin.amount,
+      description: `Toxin: +${data.toxin.amount} poison damage`,
+    });
+  }
 });
 
-// Risk Assessment for AI (1 = safest, 6 = most dangerous)
+// Generate actions array
+const ACTIONS = [
+  {
+    id: "duplicate",
+    name: "Duplicate",
+    cost: ACTION_CONFIG.costs.duplicate,
+    description: "Create a copy of selected drink",
+  },
+  {
+    id: "neutralize",
+    name: "Neutralize",
+    cost: ACTION_CONFIG.costs.neutralize,
+    description: `Make drink give +${ACTION_CONFIG.effects.neutralizeHealing} health only`,
+  },
+  {
+    id: "eliminate",
+    name: "Eliminate",
+    cost: ACTION_CONFIG.costs.eliminate,
+    description: "Remove drink from play",
+  },
+  {
+    id: "analyze",
+    name: "Analyze",
+    cost: ACTION_CONFIG.costs.analyze,
+    description: "Reveal exact effects of drink",
+  },
+  {
+    id: "spike",
+    name: "Spike",
+    cost: ACTION_CONFIG.costs.spike,
+    description: `Add +${ACTION_CONFIG.effects.spikeExtraDamage} damage to drink`,
+  },
+  {
+    id: "poison",
+    name: "Poison",
+    cost: ACTION_CONFIG.costs.poison,
+    description: `Add +${ACTION_CONFIG.effects.poisonExtraToxin} toxin to drink`,
+  },
+  {
+    id: "deadly_poison",
+    name: "Deadly Poison",
+    cost: ACTION_CONFIG.costs.deadly_poison,
+    description: `Add +${ACTION_CONFIG.effects.deadlyPoisonExtraToxin} toxin to drink`,
+  },
+];
+
+// Generate tooltips from potion data
+const DRINK_PROBABILITY_TEXT = {};
+Object.keys(POTION_DATA).forEach((color) => {
+  const data = POTION_DATA[color];
+  const parts = [];
+
+  if (data.heal) {
+    const healText = `${data.heal.chance}% heal (+${data.heal.amount}❤️${
+      data.heal.steal ? ` +steal ${data.heal.steal}❤️` : ""
+    })`;
+    parts.push(healText);
+  }
+  if (data.sabotage)
+    parts.push(
+      `${data.sabotage.chance}% sabotage (+${data.sabotage.amount}🔧)`
+    );
+  if (data.damage)
+    parts.push(`${data.damage.chance}% damage (-${data.damage.amount}❤️)`);
+  if (data.toxin)
+    parts.push(`${data.toxin.chance}% toxin (+${data.toxin.amount}☠️)`);
+
+  DRINK_PROBABILITY_TEXT[color] = parts.join(", ");
+});
+
+// Other required constants
+const DRINK_COLORS = ["blue", "green", "yellow", "red", "purple", "black"];
+
+const ACTION_EFFECTS = {
+  neutralize: {
+    health: ACTION_CONFIG.effects.neutralizeHealing,
+    sabotage: 0,
+    toxin: 0,
+    description: `Neutralized - +${ACTION_CONFIG.effects.neutralizeHealing} health only`,
+  },
+  spike: {
+    additionalDamage: ACTION_CONFIG.effects.spikeExtraDamage,
+  },
+  poison: {
+    additionalToxin: ACTION_CONFIG.effects.poisonExtraToxin,
+  },
+  deadly_poison: {
+    additionalToxin: ACTION_CONFIG.effects.deadlyPoisonExtraToxin,
+  },
+};
+
 const DRINK_RISK_SCORES = {
   blue: 1,
   green: 2,
@@ -299,10 +268,8 @@ const DRINK_RISK_SCORES = {
   black: 6,
 };
 
-// Game Messages
 const GAME_MESSAGES = {
-  gameStart:
-    "Game started! Everyone begins with 1 action point - not enough for most actions!",
+  gameStart: `Game started! Everyone begins with ${GAME_CONFIG.initialSabotage} action point - drink to earn more!`,
   newRound: "New drinks prepared for the next round!",
   gameOverWin: (winner) =>
     `Game Over! ${winner} mastered all stats and survived!`,
@@ -312,26 +279,3 @@ const GAME_MESSAGES = {
     `${player} uses ${action} on ${drink}!`,
   drinkConsumed: (player, drink) => `${player} drinks ${drink}...`,
 };
-
-// Utility function to get formatted effects text for any outcome
-function getFormattedEffectsText(outcome) {
-  const effects = [];
-
-  if (outcome.health !== 0) {
-    effects.push(`${outcome.health > 0 ? "+" : ""}${outcome.health}❤️`);
-  }
-
-  if (outcome.sabotage !== 0) {
-    effects.push(`${outcome.sabotage > 0 ? "+" : ""}${outcome.sabotage}🔧`);
-  }
-
-  if (outcome.toxin !== 0) {
-    effects.push(`${outcome.toxin > 0 ? "+" : ""}${outcome.toxin}☠️`);
-  }
-
-  if (outcome.steal) {
-    effects.push(`Steal ${outcome.steal}❤️`);
-  }
-
-  return effects.join(" ");
-}

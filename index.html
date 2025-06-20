@@ -95,16 +95,41 @@
       </div>
     </div>
 
-    <!-- Help Modal - UPDATED to use dynamic content -->
+    <!-- Help Modal -->
     <div id="help-modal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeHelpModal()">&times;</span>
         <div class="drink-legend">
           <div class="legend-title">Drink Effects Guide</div>
 
-          <!-- Dynamic content will be populated here -->
-          <div id="dynamic-drink-effects">
-            <!-- This will be filled by JavaScript -->
+          <div class="legend-row">
+            <span style="color: #74b9ff">🔵 Blue Elixir:</span>
+            <span id="blue-help-text"></span>
+          </div>
+
+          <div class="legend-row">
+            <span style="color: #00b894">🟢 Green Brew:</span>
+            <span id="green-help-text"></span>
+          </div>
+
+          <div class="legend-row">
+            <span style="color: #fdcb6e">🟡 Yellow Mixture:</span>
+            <span id="yellow-help-text"></span>
+          </div>
+
+          <div class="legend-row">
+            <span style="color: #ff6b6b">🔴 Red Potion:</span>
+            <span id="red-help-text"></span>
+          </div>
+
+          <div class="legend-row">
+            <span style="color: #a29bfe">🟣 Purple Draught:</span>
+            <span id="purple-help-text"></span>
+          </div>
+
+          <div class="legend-row">
+            <span style="color: #636e72">⚫ Black Essence:</span>
+            <span id="black-help-text"></span>
           </div>
 
           <div
@@ -133,48 +158,5 @@
     <!-- Load game configuration and logic -->
     <script src="config.js"></script>
     <script src="game.js"></script>
-    <script>
-      // Populate help modal with dynamic content when page loads
-      document.addEventListener("DOMContentLoaded", function () {
-        populateHelpModal();
-      });
-
-      function populateHelpModal() {
-        const container = document.getElementById("dynamic-drink-effects");
-        const drinkColors = {
-          blue: "#74b9ff",
-          green: "#00b894",
-          yellow: "#fdcb6e",
-          red: "#ff6b6b",
-          purple: "#a29bfe",
-          black: "#636e72",
-        };
-
-        const drinkEmojis = {
-          blue: "🔵",
-          green: "🟢",
-          yellow: "🟡",
-          red: "🔴",
-          purple: "🟣",
-          black: "⚫",
-        };
-
-        DRINK_COLORS.forEach((color) => {
-          const drinkEffect = DRINK_EFFECTS[color];
-          const row = document.createElement("div");
-          row.className = "legend-row";
-
-          const colorStyle = `color: ${drinkColors[color]}`;
-          const tooltipText = generateDrinkTooltipText(color);
-
-          row.innerHTML = `
-            <span style="${colorStyle}">${drinkEmojis[color]} ${drinkEffect.name}:</span> 
-            ${tooltipText}
-          `;
-
-          container.appendChild(row);
-        });
-      }
-    </script>
   </body>
 </html>

@@ -26,13 +26,6 @@ function initializeGame() {
     turnOrder: [],
   };
 
-  // Ensure all players have the correct structure (remove any old speed properties)
-  gameState.players.forEach((player) => {
-    delete player.speed; // Remove speed if it exists
-    if (typeof player.sabotage === "undefined") player.sabotage = 0;
-    if (typeof player.toxin === "undefined") player.toxin = 0;
-  });
-
   generateDrinks();
   updateTurnOrder();
   updateDisplay();
@@ -142,7 +135,7 @@ function updateStatsTable() {
       !player.alive ? "eliminated" : ""
     }`;
 
-    // Create cells for each stat (only sabotage and toxin now)
+    // Create cells for each stat (removed speed)
     const stats = [
       { value: player.name, class: "player-name-cell" },
       { value: player.sabotage },
@@ -157,30 +150,6 @@ function updateStatsTable() {
       statsGrid.appendChild(cell);
     });
   });
-}
-
-// UPDATED: Dynamic tooltip generation from config
-function generateDrinkTooltip(drink) {
-  let tooltipContent = `<strong>${drink.name}</strong><br>`;
-
-  if (drink.analyzed) {
-    // Show exact effect that will happen
-    const effect = getRandomOutcome(DRINK_EFFECTS[drink.color]);
-    tooltipContent += `${effect.description}<br>`;
-    tooltipContent += getEffectsText(effect);
-  } else {
-    // Show probabilities from config using our dynamic function
-    tooltipContent += generateDrinkTooltipText(drink.color);
-  }
-
-  // Add modifier effects
-  if (drink.neutralized)
-    tooltipContent += "<br><em>Neutralized: +5 health only</em>";
-  if (drink.spiked) tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
-  if (drink.poisoned)
-    tooltipContent += `<br><em>Poisoned: +${drink.poisonAmount} extra toxin</em>`;
-
-  return tooltipContent;
 }
 
 // Update Drinks Display
@@ -199,10 +168,31 @@ function updateDrinks() {
       drinkDiv.className = classes;
       drinkDiv.onclick = () => selectDrink(drink.id);
 
-      // Create tooltip with dynamic content
+      // Create tooltip
       const tooltip = document.createElement("div");
       tooltip.className = "drink-tooltip";
-      tooltip.innerHTML = generateDrinkTooltip(drink);
+
+      let tooltipContent = `<strong>${drink.name}</strong><br>`;
+
+      if (drink.analyzed) {
+        // Show all possible outcomes for analyzed drinks
+        const effects = DRINK_EFFECTS[drink.color];
+        tooltipContent += "ANALYZED - All possible outcomes:<br>";
+        effects.outcomes.forEach((outcome) => {
+          tooltipContent += `${outcome.chance}% - ${outcome.description}<br>`;
+        });
+      } else {
+        tooltipContent += DRINK_PROBABILITY_TEXT[drink.color];
+      }
+
+      if (drink.neutralized)
+        tooltipContent += "<br><em>Neutralized: +5 health only</em>";
+      if (drink.spiked)
+        tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
+      if (drink.poisoned)
+        tooltipContent += `<br><em>Poisoned: +${drink.poisonAmount} extra toxin</em>`;
+
+      tooltip.innerHTML = tooltipContent;
 
       drinkDiv.innerHTML = `<div class="drink-liquid"></div>`;
       drinkDiv.appendChild(tooltip);
@@ -374,9 +364,17 @@ function getRandomOutcome(drinkEffect) {
   return drinkEffect.outcomes[0];
 }
 
-// Get Effects Text for Display - UPDATED to use utility function
+// Get Effects Text for Display
 function getEffectsText(effect) {
-  return getFormattedEffectsText(effect);
+  const effects = [];
+  if (effect.health !== 0)
+    effects.push(`${effect.health > 0 ? "+" : ""}${effect.health}❤️`);
+  if (effect.sabotage !== 0)
+    effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
+  if (effect.toxin !== 0)
+    effects.push(`${effect.toxin > 0 ? "+" : ""}${effect.toxin}☠️`);
+  if (effect.steal) effects.push(`Steal ${effect.steal}❤️`);
+  return effects.join(" ");
 }
 
 // Action Modal Functions
@@ -643,8 +641,7 @@ function showStatChange(playerIndex, stat, change) {
   const statIndex = { sabotage: 1, toxin: 2 }[stat];
   if (!statIndex) return;
 
-  // 3 columns per player: [name, sabotage, toxin]
-  const cellIndex = playerIndex * 3 + statIndex;
+  const cellIndex = playerIndex * 3 + statIndex; // 3 columns per player (removed speed)
   const cells = statsGrid.querySelectorAll(".stats-cell");
   const targetCell = cells[cellIndex];
 
@@ -754,6 +751,14 @@ function closeOutcomeModal() {
 
 // Help Modal Functions
 function openHelpModal() {
+  // Populate help text from config
+  Object.keys(DRINK_PROBABILITY_TEXT).forEach((color) => {
+    const element = document.getElementById(`${color}-help-text`);
+    if (element) {
+      element.textContent = DRINK_PROBABILITY_TEXT[color];
+    }
+  });
+
   document.getElementById("help-modal").style.display = "block";
 }
 
