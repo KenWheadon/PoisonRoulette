@@ -9,6 +9,45 @@ const GAME_CONFIG = {
   toastDuration: 4000,
 };
 
+// TIMING CONFIGURATION - Centralized timing for easy adjustment
+const TIMING_CONFIG = {
+  // AI Turn Timings
+  aiTurnDelay: 2000, // Delay before AI takes their turn
+  aiActionDelay: 1500, // Delay between AI decision and action
+  aiDrinkDelay: 2500, // Delay after AI drinks before next turn
+
+  // Turn Results & Feedback
+  drinkOutcomeDelay: 800, // Delay before showing drink outcome modal (was 500)
+  turnSummaryDuration: 2500, // How long AI turn summary stays visible (was 2500)
+  turnResultsDelay: 1200, // Extra delay for turn results to appear after AI action
+
+  // Animation Durations
+  statChangeAnimation: 3000, // Duration of enhanced stat change animations
+  healthChangeAnimation: 2000, // Duration of health change animations
+  cardStatChangeAnimation: 2000, // Duration of card-based stat changes
+  statHighlightDuration: 1000, // How long stat highlighting lasts
+
+  // Modal & UI Timings
+  quickBarAnimation: 300, // Quick action bar slide-in duration
+  outcomeModalAnimation: 500, // Outcome modal appearance animation
+  toastSlideAnimation: 300, // Toast notification slide timing
+  progressBarTransition: 500, // Progress bar width transition
+
+  // Visual Feedback Delays
+  effectFeedbackDelay: 100, // Delay before showing visual effects
+  statUpdateDelay: 200, // Delay between stat updates for visual clarity
+  playerHighlightDelay: 150, // Delay before highlighting current player
+
+  // Turn Transition Timings
+  turnTransitionDelay: 500, // Delay between turns for visual clarity
+  roundTransitionDelay: 1000, // Delay when starting new rounds
+  gameEndDelay: 800, // Delay before showing game end screen
+
+  // Action Feedback
+  actionFeedbackDelay: 300, // Delay after action before showing results
+  sabotageSpentAnimation: 1500, // Animation for spending sabotage points
+};
+
 // Action System
 const ACTION_CONFIG = {
   costs: {

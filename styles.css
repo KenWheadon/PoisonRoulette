@@ -1,3 +1,15 @@
+/* CSS Variables for Timing Configuration */
+:root {
+  --progress-bar-transition: var(--timing-progress-transition, 0.5s);
+  --quick-bar-animation: var(--timing-quick-bar, 0.3s);
+  --toast-slide-animation: var(--timing-toast-slide, 0.3s);
+  --outcome-modal-animation: var(--timing-outcome-modal, 0.5s);
+  --stat-change-animation: var(--timing-stat-change, 3s);
+  --health-change-animation: var(--timing-health-change, 2s);
+  --card-stat-change-animation: var(--timing-card-stat-change, 2s);
+  --stat-highlight-duration: var(--timing-stat-highlight, 2s);
+}
+
 /* Poison Roulette Game Styles */
 
 body {
@@ -86,7 +98,7 @@ h1 {
   height: 100%;
   background: linear-gradient(90deg, #4ecdc4, #74b9ff, #a29bfe);
   border-radius: 10px;
-  transition: width 0.5s ease;
+  transition: width var(--progress-bar-transition) ease;
   position: relative;
   box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
 }
@@ -177,7 +189,7 @@ h1 {
   margin: 20px 0;
   padding: 20px;
   backdrop-filter: blur(10px);
-  animation: quickBarSlideIn 0.3s ease-out;
+  animation: quickBarSlideIn var(--quick-bar-animation) ease-out;
 }
 
 @keyframes quickBarSlideIn {
@@ -289,14 +301,14 @@ h1 {
 .stat-change-enhanced.positive {
   color: #4ecdc4;
   border-color: #4ecdc4;
-  animation: statChangeEnhancedUp 3s ease-out;
+  animation: statChangeEnhancedUp var(--stat-change-animation) ease-out;
   box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
 }
 
 .stat-change-enhanced.negative {
   color: #ff6b6b;
   border-color: #ff6b6b;
-  animation: statChangeEnhancedDown 3s ease-out;
+  animation: statChangeEnhancedDown var(--stat-change-animation) ease-out;
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
@@ -343,7 +355,7 @@ h1 {
   background: rgba(255, 217, 61, 0.3) !important;
   border-color: rgba(255, 217, 61, 0.6) !important;
   box-shadow: 0 0 15px rgba(255, 217, 61, 0.4);
-  animation: statHighlight 2s ease-out;
+  animation: statHighlight var(--stat-highlight-duration) ease-out;
 }
 
 @keyframes statHighlight {
@@ -357,7 +369,7 @@ h1 {
 }
 
 .health-bar.highlight {
-  animation: healthBarPulse 2s ease-out;
+  animation: healthBarPulse var(--stat-highlight-duration) ease-out;
 }
 
 @keyframes healthBarPulse {
@@ -388,7 +400,7 @@ h1 {
   min-width: 300px;
   text-align: center;
   backdrop-filter: blur(10px);
-  animation: summaryFadeIn 0.5s ease-out;
+  animation: summaryFadeIn var(--outcome-modal-animation) ease-out;
 }
 
 @keyframes summaryFadeIn {
@@ -566,13 +578,13 @@ h1 {
 .stat-change-card.positive {
   color: #4ecdc4;
   border-color: #4ecdc4;
-  animation: statChangeCardUp 2s ease-out;
+  animation: statChangeCardUp var(--card-stat-change-animation) ease-out;
 }
 
 .stat-change-card.negative {
   color: #ff6b6b;
   border-color: #ff6b6b;
-  animation: statChangeCardDown 2s ease-out;
+  animation: statChangeCardDown var(--card-stat-change-animation) ease-out;
 }
 
 @keyframes statChangeCardUp {
@@ -617,12 +629,12 @@ h1 {
 
 .health-change.positive {
   color: #4ecdc4;
-  animation: healthUp 2s ease-out;
+  animation: healthUp var(--health-change-animation) ease-out;
 }
 
 .health-change.negative {
   color: #ff6b6b;
-  animation: healthDown 2s ease-out;
+  animation: healthDown var(--health-change-animation) ease-out;
 }
 
 @keyframes healthUp {
@@ -1045,7 +1057,7 @@ h1 {
   text-align: center;
   border: 3px solid;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  animation: outcomeAppear 0.5s ease-out;
+  animation: outcomeAppear var(--outcome-modal-animation) ease-out;
 }
 
 .outcome-content.positive {
@@ -1247,7 +1259,7 @@ h1 {
 }
 
 .toast.removing {
-  animation: slideOut 0.3s ease forwards;
+  animation: slideOut var(--toast-slide-animation) ease forwards;
 }
 
 @keyframes slideIn {

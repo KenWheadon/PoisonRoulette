@@ -14,6 +14,9 @@ let gameState = {
 
 // Initialize Game
 function initializeGame() {
+  // Apply timing configuration to CSS
+  applyTimingConfigToCSS();
+
   // Reset game state with configuration
   gameState = {
     players: JSON.parse(JSON.stringify(DEFAULT_PLAYERS)), // Deep copy
@@ -33,6 +36,45 @@ function initializeGame() {
 
   // Only show initial game message
   showToast(GAME_MESSAGES.gameStart);
+}
+
+// Apply timing configuration to CSS custom properties
+function applyTimingConfigToCSS() {
+  const root = document.documentElement;
+
+  // Convert timing values to CSS custom properties
+  root.style.setProperty(
+    "--timing-progress-transition",
+    `${TIMING_CONFIG.progressBarTransition}ms`
+  );
+  root.style.setProperty(
+    "--timing-quick-bar",
+    `${TIMING_CONFIG.quickBarAnimation}ms`
+  );
+  root.style.setProperty(
+    "--timing-toast-slide",
+    `${TIMING_CONFIG.toastSlideAnimation}ms`
+  );
+  root.style.setProperty(
+    "--timing-outcome-modal",
+    `${TIMING_CONFIG.outcomeModalAnimation}ms`
+  );
+  root.style.setProperty(
+    "--timing-stat-change",
+    `${TIMING_CONFIG.statChangeAnimation}ms`
+  );
+  root.style.setProperty(
+    "--timing-health-change",
+    `${TIMING_CONFIG.healthChangeAnimation}ms`
+  );
+  root.style.setProperty(
+    "--timing-card-stat-change",
+    `${TIMING_CONFIG.cardStatChangeAnimation}ms`
+  );
+  root.style.setProperty(
+    "--timing-stat-highlight",
+    `${TIMING_CONFIG.statHighlightDuration}ms`
+  );
 }
 
 // Generate Drinks for Current Round
@@ -436,6 +478,18 @@ function processDrink(player, drink) {
     player.alive = false;
   }
 
+  // Collect changes for summary/modal
+  const changes = [];
+  if (outcome.health !== 0) {
+    changes.push({ type: "health", value: outcome.health, icon: "❤️" });
+  }
+  if (outcome.sabotage !== 0) {
+    changes.push({ type: "sabotage", value: outcome.sabotage, icon: "🔧" });
+  }
+  if (outcome.toxin !== 0) {
+    changes.push({ type: "toxin", value: outcome.toxin, icon: "☠️" });
+  }
+
   // Show visual feedback
   const playerIndex = gameState.players.indexOf(player);
   showEffectChanges(playerIndex, outcome);
@@ -444,11 +498,18 @@ function processDrink(player, drink) {
   if (player.isHuman) {
     setTimeout(() => {
       showDrinkOutcome(player, drink, outcome);
-    }, 500);
+    }, TIMING_CONFIG.drinkOutcomeDelay);
   } else {
-    // For AI players, update display and continue immediately
+    // For AI players, update display and continue with proper timing
     updateDisplay();
     gameState.selectedDrink = null;
+
+    // Show AI turn results with proper timing
+    setTimeout(() => {
+      if (changes.length > 0) {
+        showTurnSummary(player.name, changes);
+      }
+    }, TIMING_CONFIG.turnResultsDelay);
   }
 }
 
@@ -464,28 +525,31 @@ function showEffectChanges(playerIndex, outcome) {
   const player = gameState.players[playerIndex];
   const changes = [];
 
-  // Collect all changes for summary
-  if (outcome.health !== 0) {
-    changes.push({ type: "health", value: outcome.health, icon: "❤️" });
-    showEnhancedHealthChange(playerIndex, outcome.health);
-  }
+  // Add slight delay for visual clarity
+  setTimeout(() => {
+    // Collect all changes for summary
+    if (outcome.health !== 0) {
+      changes.push({ type: "health", value: outcome.health, icon: "❤️" });
+      showEnhancedHealthChange(playerIndex, outcome.health);
+    }
 
-  if (outcome.sabotage !== 0) {
-    changes.push({ type: "sabotage", value: outcome.sabotage, icon: "🔧" });
-    showEnhancedStatChange(playerIndex, "sabotage", outcome.sabotage);
-  }
+    if (outcome.sabotage !== 0) {
+      changes.push({ type: "sabotage", value: outcome.sabotage, icon: "🔧" });
+      setTimeout(() => {
+        showEnhancedStatChange(playerIndex, "sabotage", outcome.sabotage);
+      }, TIMING_CONFIG.statUpdateDelay);
+    }
 
-  if (outcome.toxin !== 0) {
-    changes.push({ type: "toxin", value: outcome.toxin, icon: "☠️" });
-    showEnhancedStatChange(playerIndex, "toxin", outcome.toxin);
-  }
+    if (outcome.toxin !== 0) {
+      changes.push({ type: "toxin", value: outcome.toxin, icon: "☠️" });
+      setTimeout(() => {
+        showEnhancedStatChange(playerIndex, "toxin", outcome.toxin);
+      }, TIMING_CONFIG.statUpdateDelay * 2);
+    }
 
-  // Only show turn summary for AI players (human players get the detailed modal)
-  if (changes.length > 0 && !player.isHuman) {
-    setTimeout(() => {
-      showTurnSummary(player.name, changes);
-    }, 1000);
-  }
+    // Store changes for later use (AI turn summary)
+    player._lastTurnChanges = changes;
+  }, TIMING_CONFIG.effectFeedbackDelay);
 }
 
 // NEW: Enhanced stat changes with improved animations
@@ -497,7 +561,7 @@ function showEnhancedStatChange(playerIndex, statType, change) {
     statElement.classList.add("highlight");
     setTimeout(() => {
       statElement.classList.remove("highlight");
-    }, 2000);
+    }, TIMING_CONFIG.statHighlightDuration);
 
     // Create enhanced change indicator
     const changeElement = document.createElement("div");
@@ -513,7 +577,7 @@ function showEnhancedStatChange(playerIndex, statType, change) {
       if (changeElement.parentNode) {
         statElement.removeChild(changeElement);
       }
-    }, 3000);
+    }, TIMING_CONFIG.statChangeAnimation);
   }
 }
 
@@ -528,7 +592,7 @@ function showEnhancedHealthChange(playerIndex, change) {
       healthBar.classList.add("highlight");
       setTimeout(() => {
         healthBar.classList.remove("highlight");
-      }, 2000);
+      }, TIMING_CONFIG.statHighlightDuration);
     }
 
     // Create enhanced change indicator
@@ -545,7 +609,7 @@ function showEnhancedHealthChange(playerIndex, change) {
       if (changeElement.parentNode) {
         playerCard.removeChild(changeElement);
       }
-    }, 3000);
+    }, TIMING_CONFIG.healthChangeAnimation);
   }
 }
 
@@ -574,10 +638,10 @@ function showTurnSummary(playerName, changes) {
 
   document.body.appendChild(summaryDiv);
 
-  // Auto-close after 2.5 seconds for AI players
+  // Auto-close after configured duration for AI players
   setTimeout(() => {
     closeTurnSummary();
-  }, 2500);
+  }, TIMING_CONFIG.turnSummaryDuration);
 }
 
 // NEW: Close turn summary
@@ -687,19 +751,23 @@ function performAction(actionId) {
       break;
   }
 
-  // Show sabotage cost being spent
-  showEnhancedStatChange(
-    gameState.players.indexOf(currentPlayer),
-    "sabotage",
-    -action.cost
-  );
+  // Show sabotage cost being spent with timing
+  setTimeout(() => {
+    showEnhancedStatChange(
+      gameState.players.indexOf(currentPlayer),
+      "sabotage",
+      -action.cost
+    );
+  }, TIMING_CONFIG.actionFeedbackDelay);
 
   gameState.selectedDrink = null;
 
   // Update display to hide quick bar and cost indicators
   updateDisplay();
 
-  nextTurn();
+  setTimeout(() => {
+    nextTurn();
+  }, TIMING_CONFIG.turnTransitionDelay);
 }
 
 // Turn Management
@@ -747,7 +815,7 @@ function nextTurn() {
   updateDisplay();
 
   if (!gameState.players[gameState.currentPlayerIndex].isHuman) {
-    setTimeout(aiTurn, 1500);
+    setTimeout(aiTurn, TIMING_CONFIG.aiTurnDelay);
   }
 }
 
@@ -803,7 +871,7 @@ function aiTurn() {
 
   // Just drink
   processDrink(currentPlayer, randomDrink);
-  setTimeout(nextTurn, 1000);
+  setTimeout(nextTurn, TIMING_CONFIG.aiDrinkDelay);
 }
 
 // Game Flow Functions
@@ -817,7 +885,7 @@ function startDrinkingPhase() {
   updateDisplay();
 
   if (!gameState.players[gameState.currentPlayerIndex].isHuman) {
-    setTimeout(aiTurn, 1000);
+    setTimeout(aiTurn, TIMING_CONFIG.roundTransitionDelay);
   }
 }
 
@@ -877,7 +945,7 @@ function showStatChangeInCard(playerIndex, statType, change) {
       if (changeElement.parentNode) {
         statElement.removeChild(changeElement);
       }
-    }, 2000);
+    }, TIMING_CONFIG.cardStatChangeAnimation);
   }
 }
 
@@ -982,7 +1050,7 @@ function showToast(message, type = "") {
         if (toast.parentNode) {
           toastContainer.removeChild(toast);
         }
-      }, 300);
+      }, TIMING_CONFIG.toastSlideAnimation);
     }
   }, GAME_CONFIG.toastDuration);
 }
