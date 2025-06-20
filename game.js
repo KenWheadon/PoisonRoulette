@@ -142,9 +142,6 @@ function updateGameProgress() {
   }
 }
 
-// REMOVED: Action Cost Display (as requested)
-// This function is no longer used
-
 // UPDATE: Quick Action Bar with round-based actions and tooltips
 function updateQuickActionBar() {
   const quickBar = document.getElementById("action-quick-bar");
@@ -214,7 +211,6 @@ function updateDisplay() {
   updateControls();
   updateTurnOrder();
   updateGameProgress();
-  // REMOVED: updateActionCostDisplay() as requested
   updateQuickActionBar();
 }
 
@@ -441,18 +437,6 @@ function processDrink(player, drink) {
     player.alive = false;
   }
 
-  // Collect changes for summary/modal
-  const changes = [];
-  if (outcome.health !== 0) {
-    changes.push({ type: "health", value: outcome.health, icon: "❤️" });
-  }
-  if (outcome.sabotage !== 0) {
-    changes.push({ type: "sabotage", value: outcome.sabotage, icon: "🔧" });
-  }
-  if (outcome.toxin !== 0) {
-    changes.push({ type: "toxin", value: outcome.toxin, icon: "☠️" });
-  }
-
   // Show visual feedback
   const playerIndex = gameState.players.indexOf(player);
   showEffectChanges(playerIndex, outcome);
@@ -466,13 +450,7 @@ function processDrink(player, drink) {
     // For AI players, update display and continue with proper timing
     updateDisplay();
     gameState.selectedDrink = null;
-
-    // Show AI turn results with proper timing
-    setTimeout(() => {
-      if (changes.length > 0) {
-        showTurnSummary(player.name, changes);
-      }
-    }, TIMING_CONFIG.turnResultsDelay);
+    // REMOVED: Turn summary popup for AI players - visual feedback is sufficient
   }
 }
 
@@ -510,7 +488,7 @@ function showEffectChanges(playerIndex, outcome) {
       }, TIMING_CONFIG.statUpdateDelay * 2);
     }
 
-    // Store changes for later use (AI turn summary)
+    // Store changes for later use (no longer used for AI turn summary)
     player._lastTurnChanges = changes;
   }, TIMING_CONFIG.effectFeedbackDelay);
 }
@@ -574,55 +552,6 @@ function showEnhancedHealthChange(playerIndex, change) {
         playerCard.removeChild(changeElement);
       }
     }, TIMING_CONFIG.healthChangeAnimation);
-  }
-}
-
-// NEW: Turn Summary Display (AI players only)
-function showTurnSummary(playerName, changes) {
-  const summaryDiv = document.createElement("div");
-  summaryDiv.className = "turn-summary";
-
-  let changesHtml = "";
-  changes.forEach((change) => {
-    const changeClass = change.value > 0 ? "positive" : "negative";
-    let displayValue = change.value;
-
-    // Apply health division to health changes in summary
-    if (change.type === "health") {
-      displayValue = getDisplayHealth(Math.abs(change.value));
-      displayValue = change.value > 0 ? `+${displayValue}` : `-${displayValue}`;
-    } else {
-      displayValue = change.value > 0 ? `+${change.value}` : `${change.value}`;
-    }
-
-    changesHtml += `
-      <div class="summary-change-item ${changeClass}">
-        <div>${change.icon}</div>
-        <div>${displayValue}</div>
-      </div>
-    `;
-  });
-
-  summaryDiv.innerHTML = `
-    <div class="summary-title">${playerName}'s Turn Results</div>
-    <div class="summary-changes">
-      ${changesHtml}
-    </div>
-  `;
-
-  document.body.appendChild(summaryDiv);
-
-  // Auto-close after configured duration for AI players
-  setTimeout(() => {
-    closeTurnSummary();
-  }, TIMING_CONFIG.turnSummaryDuration);
-}
-
-// NEW: Close turn summary
-function closeTurnSummary() {
-  const summary = document.querySelector(".turn-summary");
-  if (summary) {
-    summary.remove();
   }
 }
 
@@ -908,10 +837,9 @@ function startNewGame() {
   document.getElementById("winner-announcement").style.display = "none";
   closeHelpModal();
 
-  // Clear any existing toasts and turn summaries
+  // Clear any existing toasts
   const toastContainer = document.getElementById("toast-container");
   toastContainer.innerHTML = "";
-  closeTurnSummary();
 
   initializeGame();
 }
@@ -1012,9 +940,6 @@ function showDrinkOutcome(player, drink, outcome) {
 
 function closeOutcomeModal() {
   document.getElementById("outcome-modal").style.display = "none";
-
-  // Close any existing turn summary
-  closeTurnSummary();
 
   // After closing the modal, proceed to next turn
   updateDisplay();

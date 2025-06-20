@@ -32,19 +32,6 @@
         <!-- Drinks will be generated here -->
       </div>
 
-      <!-- Inline Action Quick-Bar -->
-      <div class="action-quick-bar" id="action-quick-bar" style="display: none">
-        <div class="quick-bar-header">
-          <span class="quick-bar-title">Actions for Selected Drink</span>
-          <span class="sabotage-points"
-            >🔧 <span id="current-sabotage">0</span></span
-          >
-        </div>
-        <div class="quick-actions" id="quick-actions">
-          <!-- Quick action buttons will be generated here -->
-        </div>
-      </div>
-
       <div class="controls">
         <button
           class="btn"
@@ -56,20 +43,25 @@
         </button>
         <button
           class="btn"
-          id="action-btn"
-          onclick="openActionModal()"
-          style="display: none"
-        >
-          ACTIONS
-        </button>
-        <button
-          class="btn"
           id="new-game-btn"
           onclick="startNewGame()"
           style="display: none"
         >
           New Game
         </button>
+      </div>
+
+      <!-- Inline Action Quick-Bar -->
+      <div class="action-quick-bar" id="action-quick-bar" style="display: none">
+        <div class="quick-bar-header">
+          <span class="quick-bar-title">Actions for Selected Drink</span>
+          <span class="sabotage-points"
+            >🔧 <span id="current-sabotage">0</span></span
+          >
+        </div>
+        <div class="quick-actions" id="quick-actions">
+          <!-- Quick action buttons will be generated here -->
+        </div>
       </div>
 
       <div class="winner-announcement" id="winner-announcement">
