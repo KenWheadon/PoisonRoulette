@@ -114,13 +114,7 @@ function updatePlayers() {
           <span class="stat-value">${player.toxin}</span>
         </div>
       </div>
-      <div class="player-status">${
-        player.alive
-          ? index === gameState.currentPlayerIndex
-            ? "🎯 Active Turn"
-            : "⚡ Ready"
-          : "💀 Eliminated"
-      }</div>
+      <div class="player-status">${player.alive ? "" : "💀 Eliminated"}</div>
     `;
 
     grid.appendChild(playerDiv);
