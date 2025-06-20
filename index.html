@@ -10,6 +10,20 @@
     <div class="game-container">
       <h1>🥂☠️ Poison Roulette ☠️🥂</h1>
 
+      <div class="game-progress">
+        <div class="progress-header">
+          <h3>Round <span id="current-round">1</span></h3>
+          <div class="drinks-remaining">
+            <span id="drinks-count">8</span> drinks left
+          </div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="round-progress-bar">
+            <div class="progress-fill" id="round-progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="turn-order">
         <h3>Current Turn</h3>
         <div id="turn-order-display"></div>
@@ -21,6 +35,30 @@
 
       <div class="drinks-container" id="drinks-container">
         <!-- Drinks will be generated here -->
+      </div>
+
+      <!-- Inline Action Quick-Bar -->
+      <div class="action-quick-bar" id="action-quick-bar" style="display: none">
+        <div class="quick-bar-header">
+          <span class="quick-bar-title">Actions for Selected Drink</span>
+          <span class="sabotage-points"
+            >🔧 <span id="current-sabotage">0</span></span
+          >
+        </div>
+        <div class="quick-actions" id="quick-actions">
+          <!-- Quick action buttons will be generated here -->
+        </div>
+      </div>
+
+      <!-- Action Cost Indicators -->
+      <div
+        class="action-costs-display"
+        id="action-costs-display"
+        style="display: none"
+      >
+        <div class="cost-chips" id="cost-chips">
+          <!-- Action cost chips will be generated here -->
+        </div>
       </div>
 
       <div class="controls">
@@ -65,7 +103,6 @@
             <div class="drink-liquid" id="outcome-liquid"></div>
           </div>
           <div class="outcome-title" id="outcome-title"></div>
-          <div class="outcome-description" id="outcome-description"></div>
           <div class="outcome-effects" id="outcome-effects"></div>
           <button class="continue-btn" onclick="closeOutcomeModal()">
             Continue
