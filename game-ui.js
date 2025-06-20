@@ -31,7 +31,7 @@ function updateGameProgress() {
   }
 }
 
-// Quick Action Bar with round-based actions and tooltips
+// Quick Action Bar with dropdown design - SIMPLIFIED
 function updateQuickActionBar() {
   const quickBar = document.getElementById("action-quick-bar");
   const quickActions = document.getElementById("quick-actions");
@@ -45,9 +45,24 @@ function updateQuickActionBar() {
     currentPlayer && currentPlayer.isHuman && currentPlayer.alive;
 
   if (hasSelection && isHumanTurn && !gameState.gameOver) {
+    // Show dropdown
     quickBar.style.display = "block";
     currentSabotage.textContent = currentPlayer.sabotage;
     quickActions.innerHTML = "";
+
+    // Add close button if it doesn't exist
+    if (!quickBar.querySelector(".dropdown-close")) {
+      const closeButton = document.createElement("div");
+      closeButton.className = "dropdown-close";
+      closeButton.innerHTML = "×";
+      closeButton.onclick = () => {
+        gameState.selectedDrink = null;
+        quickBar.style.display = "none";
+        updateDisplay();
+      };
+      closeButton.title = "Close actions menu";
+      quickBar.appendChild(closeButton);
+    }
 
     // Action icons mapping
     const actionIcons = {
@@ -80,6 +95,7 @@ function updateQuickActionBar() {
       if (canAfford) {
         button.onclick = () => {
           performAction(action.id);
+          quickBar.style.display = "none";
         };
       }
 
@@ -88,9 +104,53 @@ function updateQuickActionBar() {
 
       quickActions.appendChild(button);
     });
+
+    // Add click outside to close
+    setTimeout(() => {
+      document.addEventListener("click", handleDropdownClickOutside);
+    }, 100);
   } else {
     quickBar.style.display = "none";
+    document.removeEventListener("click", handleDropdownClickOutside);
   }
+}
+
+// Show dropdown actions panel
+function showActionDropdown() {
+  const quickBar = document.getElementById("action-quick-bar");
+  if (quickBar) {
+    quickBar.style.display = "block";
+  }
+}
+
+// Hide dropdown actions panel
+function hideActionDropdown() {
+  const quickBar = document.getElementById("action-quick-bar");
+  if (quickBar) {
+    quickBar.style.display = "none";
+  }
+}
+
+// Handle clicks outside dropdown to close it
+function handleDropdownClickOutside(event) {
+  const quickBar = document.getElementById("action-quick-bar");
+  const drinksContainer = document.getElementById("drinks-container");
+
+  // Don't close if clicking inside the dropdown
+  if (quickBar && quickBar.contains(event.target)) {
+    return;
+  }
+
+  // Don't close if clicking on drinks (to allow reselection)
+  if (drinksContainer && drinksContainer.contains(event.target)) {
+    return;
+  }
+
+  // Close the dropdown
+  gameState.selectedDrink = null;
+  quickBar.style.display = "none";
+  document.removeEventListener("click", handleDropdownClickOutside);
+  updateDisplay();
 }
 
 // Player Display with Health Division by 10

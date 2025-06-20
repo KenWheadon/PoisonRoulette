@@ -304,14 +304,27 @@ function startNewGame() {
   const toastContainer = document.getElementById("toast-container");
   toastContainer.innerHTML = "";
 
+  // Hide dropdown
+  const quickBar = document.getElementById("action-quick-bar");
+  if (quickBar) {
+    quickBar.style.display = "none";
+  }
+
   initializeGame();
 }
 
-// Select a Drink
+// Select a Drink - UPDATED TO TRIGGER DROPDOWN
 function selectDrink(drinkId) {
   if (gameState.gameOver) return;
+
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+  const isHumanTurn =
+    currentPlayer && currentPlayer.isHuman && currentPlayer.alive;
+
+  if (!isHumanTurn) return;
+
   gameState.selectedDrink = drinkId;
-  updateDisplay();
+  updateDisplay(); // This will show the dropdown
 }
 
 // Drink Selection Handler
@@ -320,6 +333,12 @@ function drinkSelected() {
 
   const drink = gameState.drinks.find((d) => d.id === gameState.selectedDrink);
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+
+  // Hide dropdown
+  const quickBar = document.getElementById("action-quick-bar");
+  if (quickBar) {
+    quickBar.style.display = "none";
+  }
 
   processDrink(currentPlayer, drink);
 
