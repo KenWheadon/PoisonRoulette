@@ -949,11 +949,34 @@ function closeOutcomeModal() {
 
 // Help Modal Functions
 function openHelpModal() {
-  // Populate help text from config
-  Object.keys(DRINK_PROBABILITY_TEXT).forEach((color) => {
+  // Populate help text from config with display health
+  Object.keys(POTION_DATA).forEach((color) => {
     const element = document.getElementById(`${color}-help-text`);
     if (element) {
-      element.textContent = DRINK_PROBABILITY_TEXT[color];
+      const data = POTION_DATA[color];
+      const parts = [];
+
+      if (data.heal) {
+        const displayHeal = getDisplayHealth(data.heal.amount);
+        const healText = `${data.heal.chance}% heal (+${displayHeal}❤️${
+          data.heal.steal
+            ? ` +steal ${getDisplayHealth(data.heal.steal)}❤️`
+            : ""
+        })`;
+        parts.push(healText);
+      }
+      if (data.sabotage)
+        parts.push(
+          `${data.sabotage.chance}% sabotage (+${data.sabotage.amount}🔧)`
+        );
+      if (data.damage) {
+        const displayDamage = getDisplayHealth(data.damage.amount);
+        parts.push(`${data.damage.chance}% damage (-${displayDamage}❤️)`);
+      }
+      if (data.toxin)
+        parts.push(`${data.toxin.chance}% toxin (+${data.toxin.amount}☠️)`);
+
+      element.textContent = parts.join(", ");
     }
   });
 

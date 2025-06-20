@@ -71,7 +71,7 @@ const ACTION_CONFIG = {
 const POTION_DATA = {
   blue: {
     name: "Blue Elixir",
-    heal: { chance: 45, amount: 15 },
+    heal: { chance: 45, amount: 20 },
     sabotage: { chance: 30, amount: 2 },
     toxin: { chance: 25, amount: 4 },
     mostLikely: "heal", // Added most likely outcome
@@ -80,12 +80,12 @@ const POTION_DATA = {
     name: "Green Brew",
     heal: { chance: 30, amount: 20 },
     sabotage: { chance: 50, amount: 4 },
-    damage: { chance: 20, amount: 25 },
+    damage: { chance: 20, amount: 20 },
     mostLikely: "sabotage", // Added most likely outcome
   },
   yellow: {
     name: "Yellow Mixture",
-    heal: { chance: 45, amount: 25 },
+    heal: { chance: 45, amount: 30 },
     sabotage: { chance: 20, amount: 3 },
     toxin: { chance: 35, amount: 5 },
     mostLikely: "heal", // Added most likely outcome (tied with toxin, but heal is more positive)
@@ -99,7 +99,7 @@ const POTION_DATA = {
   },
   purple: {
     name: "Purple Draught",
-    heal: { chance: 15, amount: 45 },
+    heal: { chance: 15, amount: 50 },
     sabotage: { chance: 25, amount: 8 },
     toxin: { chance: 60, amount: 8 },
     mostLikely: "toxin", // Added most likely outcome
