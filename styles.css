@@ -337,22 +337,23 @@ h1 {
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.95);
   color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 16px;
+  border-radius: 12px;
   font-size: 0.85em;
   z-index: 100;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  min-width: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  min-width: 240px;
   max-width: 280px;
   white-space: normal;
   text-align: center;
   line-height: 1.4;
   margin-bottom: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .drink:hover .drink-tooltip {
@@ -365,8 +366,102 @@ h1 {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: rgba(0, 0, 0, 0.9);
+  border: 8px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}
+
+.tooltip-header {
+  color: #ffd93d;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-effects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tooltip-effect {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 60px;
+  justify-content: center;
+}
+
+.tooltip-effect.positive {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: rgba(78, 205, 196, 0.4);
+}
+
+.tooltip-effect.neutral {
+  background: rgba(255, 217, 61, 0.2);
+  border-color: rgba(255, 217, 61, 0.4);
+}
+
+.tooltip-effect.negative {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: rgba(255, 107, 107, 0.4);
+}
+
+.effect-chance {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.effect-symbol {
+  font-size: 1.2em;
+  margin: 2px 0;
+}
+
+.effect-amount {
+  font-weight: bold;
+  font-size: 0.85em;
+  color: #ddd;
+}
+
+.tooltip-analyzed {
+  color: #74b9ff;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.tooltip-outcome {
+  background: rgba(116, 185, 255, 0.1);
+  border: 1px solid rgba(116, 185, 255, 0.3);
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin: 4px 0;
+  font-size: 0.8em;
+}
+
+.tooltip-modifications {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-mod {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin: 4px 0;
+  font-size: 0.8em;
+  font-style: italic;
+  color: #ffd93d;
 }
 
 /* Controls and Buttons */
@@ -898,6 +993,32 @@ h1 {
   .drink {
     width: 35px;
     height: 70px;
+  }
+
+  .drink-tooltip {
+    min-width: 200px;
+    max-width: 240px;
+    font-size: 0.8em;
+    padding: 12px;
+  }
+
+  .tooltip-effects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 6px;
+  }
+
+  .tooltip-effect {
+    padding: 6px 3px;
+    min-height: 50px;
+  }
+
+  .effect-symbol {
+    font-size: 1.1em;
+  }
+
+  .effect-chance,
+  .effect-amount {
+    font-size: 0.8em;
   }
 
   .controls {

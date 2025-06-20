@@ -1,6 +1,6 @@
 // Core Game Settings
 const GAME_CONFIG = {
-  initialHealth: 100,
+  initialHealth: 50,
   initialSabotage: 1,
   initialToxin: 0,
   firstRoundDrinks: 8,
@@ -62,7 +62,7 @@ const POTION_DATA = {
   },
   black: {
     name: "Black Essence",
-    heal: { chance: 10, amount: 60, steal: 15 },
+    heal: { chance: 10, amount: 60 },
     sabotage: { chance: 20, amount: 10 },
     damage: { chance: 70, amount: 50 },
   },
@@ -214,7 +214,55 @@ const ACTIONS = [
   },
 ];
 
-// Generate tooltips from potion data
+// Generate structured tooltip data from potion data
+const DRINK_TOOLTIP_DATA = {};
+Object.keys(POTION_DATA).forEach((color) => {
+  const data = POTION_DATA[color];
+  const effects = [];
+
+  // Always add heal first (left column)
+  if (data.heal) {
+    effects.push({
+      chance: data.heal.chance,
+      symbol: "❤️",
+      amount: `+${data.heal.amount}`,
+      type: "heal",
+      steal: data.heal.steal || null,
+    });
+  }
+
+  // Add sabotage second (middle column)
+  if (data.sabotage) {
+    effects.push({
+      chance: data.sabotage.chance,
+      symbol: "🔧",
+      amount: `+${data.sabotage.amount}`,
+      type: "sabotage",
+    });
+  }
+
+  // Add damage/toxin last (right column)
+  if (data.damage) {
+    effects.push({
+      chance: data.damage.chance,
+      symbol: "💥",
+      amount: `-${data.damage.amount}`,
+      type: "damage",
+    });
+  }
+  if (data.toxin) {
+    effects.push({
+      chance: data.toxin.chance,
+      symbol: "☠️",
+      amount: `+${data.toxin.amount}`,
+      type: "toxin",
+    });
+  }
+
+  DRINK_TOOLTIP_DATA[color] = effects;
+});
+
+// Keep legacy text format for help modal
 const DRINK_PROBABILITY_TEXT = {};
 Object.keys(POTION_DATA).forEach((color) => {
   const data = POTION_DATA[color];

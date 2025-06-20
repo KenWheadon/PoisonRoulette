@@ -172,25 +172,59 @@ function updateDrinks() {
       const tooltip = document.createElement("div");
       tooltip.className = "drink-tooltip";
 
-      let tooltipContent = `<strong>${drink.name}</strong><br>`;
+      let tooltipContent = `<div class="tooltip-header"><strong>${drink.name}</strong></div>`;
 
       if (drink.analyzed) {
         // Show all possible outcomes for analyzed drinks
         const effects = DRINK_EFFECTS[drink.color];
-        tooltipContent += "ANALYZED - All possible outcomes:<br>";
+        tooltipContent +=
+          '<div class="tooltip-analyzed">ANALYZED - All outcomes:</div>';
+        tooltipContent += '<div class="tooltip-effects">';
         effects.outcomes.forEach((outcome) => {
-          tooltipContent += `${outcome.chance}% - ${outcome.description}<br>`;
+          tooltipContent += `<div class="tooltip-outcome">${outcome.chance}% - ${outcome.description}</div>`;
         });
+        tooltipContent += "</div>";
       } else {
-        tooltipContent += DRINK_PROBABILITY_TEXT[drink.color];
+        // Show structured effects in three columns
+        const effectData = DRINK_TOOLTIP_DATA[drink.color];
+        tooltipContent += '<div class="tooltip-effects-grid">';
+
+        effectData.forEach((effect) => {
+          const effectClass =
+            effect.type === "heal"
+              ? "positive"
+              : effect.type === "sabotage"
+              ? "neutral"
+              : "negative";
+
+          tooltipContent += `
+            <div class="tooltip-effect ${effectClass}">
+              <div class="effect-chance">${effect.chance}%</div>
+              <div class="effect-symbol">${effect.symbol}</div>
+              <div class="effect-amount">${effect.amount}${
+            effect.steal ? ` +${effect.steal}❤️` : ""
+          }</div>
+            </div>
+          `;
+        });
+
+        tooltipContent += "</div>";
       }
 
-      if (drink.neutralized)
-        tooltipContent += "<br><em>Neutralized: +5 health only</em>";
-      if (drink.spiked)
-        tooltipContent += "<br><em>Spiked: +15 extra damage</em>";
+      // Add modification status
+      const modifications = [];
+      if (drink.neutralized) modifications.push("Neutralized: +5❤️ only");
+      if (drink.spiked) modifications.push("Spiked: +15💥 damage");
       if (drink.poisoned)
-        tooltipContent += `<br><em>Poisoned: +${drink.poisonAmount} extra toxin</em>`;
+        modifications.push(`Poisoned: +${drink.poisonAmount}☠️ toxin`);
+
+      if (modifications.length > 0) {
+        tooltipContent += '<div class="tooltip-modifications">';
+        modifications.forEach((mod) => {
+          tooltipContent += `<div class="tooltip-mod">${mod}</div>`;
+        });
+        tooltipContent += "</div>";
+      }
 
       tooltip.innerHTML = tooltipContent;
 
