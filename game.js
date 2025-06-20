@@ -119,9 +119,6 @@ function updateTurnOrder() {
       ? gameState.players[gameState.currentPlayerIndex]?.name ||
         alivePlayers[0].name
       : "None";
-
-  const display = document.getElementById("turn-order-display");
-  display.textContent = currentPlayerName;
 }
 
 // UPDATE: Game Progress Display with corrected drinks count
@@ -356,44 +353,25 @@ function updateDrinks() {
 // Update Control Buttons
 function updateControls() {
   const drinkBtn = document.getElementById("drink-btn");
-  const actionBtn = document.getElementById("action-btn");
   const newGameBtn = document.getElementById("new-game-btn");
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   const isHumanTurn =
     currentPlayer && currentPlayer.isHuman && currentPlayer.alive;
   const hasSelection = gameState.selectedDrink !== null;
-  const canUseAction = currentPlayer && currentPlayer.sabotage >= 2;
 
   // Show/hide buttons based on game state
   if (isHumanTurn && hasSelection && !gameState.gameOver) {
     drinkBtn.style.display = "inline-block";
-    actionBtn.style.display = "inline-block";
-
     drinkBtn.disabled = false;
     drinkBtn.textContent = "DRINK";
-
-    if (canUseAction) {
-      actionBtn.disabled = false;
-      actionBtn.className = "btn action-available";
-      actionBtn.textContent = "ACTIONS";
-    } else {
-      actionBtn.disabled = true;
-      actionBtn.className = "btn";
-      actionBtn.textContent = "ACTIONS";
-    }
   } else {
     if (!isHumanTurn || gameState.gameOver) {
       drinkBtn.style.display = "none";
-      actionBtn.style.display = "none";
     } else {
       drinkBtn.style.display = "inline-block";
-      actionBtn.style.display = "inline-block";
       drinkBtn.disabled = true;
-      actionBtn.disabled = true;
       drinkBtn.textContent = "Select a Drink";
-      actionBtn.textContent = "ACTIONS";
-      actionBtn.className = "btn";
     }
   }
 
