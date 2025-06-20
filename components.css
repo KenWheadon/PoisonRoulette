@@ -570,7 +570,7 @@
 
 .modal-content {
   background: linear-gradient(135deg, #2d3436, #636e72);
-  margin: 5% auto;
+  margin: 2% auto;
   padding: clamp(20px, 4vw, 30px);
   border-radius: 20px;
   width: clamp(300px, 90vw, 600px);
@@ -1068,7 +1068,7 @@
   }
 
   .modal-content {
-    margin: 5% auto;
+    margin: 2% auto;
     padding: 20px;
     width: 95%;
     max-height: 85vh;
