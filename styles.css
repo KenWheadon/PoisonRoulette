@@ -130,53 +130,6 @@ h1 {
   }
 }
 
-/* Action Cost Indicators */
-.action-costs-display {
-  text-align: center;
-  margin: 15px 0;
-  padding: 10px;
-}
-
-.cost-chips {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.cost-chip {
-  background: rgba(255, 217, 61, 0.2);
-  border: 1px solid rgba(255, 217, 61, 0.4);
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 0.8em;
-  color: #ffd93d;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.cost-chip:hover {
-  background: rgba(255, 217, 61, 0.3);
-  transform: translateY(-1px);
-}
-
-.cost-chip.affordable {
-  background: rgba(78, 205, 196, 0.2);
-  border-color: rgba(78, 205, 196, 0.4);
-  color: #4ecdc4;
-}
-
-.cost-chip.expensive {
-  background: rgba(255, 107, 107, 0.2);
-  border-color: rgba(255, 107, 107, 0.4);
-  color: #ff6b6b;
-  opacity: 0.6;
-}
-
 /* Inline Action Quick-Bar */
 .action-quick-bar {
   background: linear-gradient(
@@ -511,7 +464,7 @@ h1 {
   color: #ddd;
 }
 
-/* NEW: Player Stats Display */
+/* Player Stats Display */
 .player-stats {
   display: flex;
   justify-content: space-around;
@@ -559,7 +512,7 @@ h1 {
   font-weight: bold;
 }
 
-/* NEW: Stat Change Animations for Player Cards */
+/* Stat Change Animations for Player Cards */
 .stat-change-card {
   position: absolute;
   top: 50%;
@@ -714,6 +667,23 @@ h1 {
 .drink.spiked {
   border-color: #ff6b6b;
   box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+}
+
+/* NEW: Most Likely Outcome Icon */
+.drink-likely-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  z-index: 5;
 }
 
 .drink-liquid {
@@ -1453,21 +1423,6 @@ h1 {
     font-size: 0.8em;
   }
 
-  /* Action Cost Chips Mobile */
-  .action-costs-display {
-    margin: 10px 0;
-    padding: 8px;
-  }
-
-  .cost-chips {
-    gap: 8px;
-  }
-
-  .cost-chip {
-    padding: 4px 8px;
-    font-size: 0.75em;
-  }
-
   .players-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
@@ -1514,6 +1469,14 @@ h1 {
   .drink {
     width: 35px;
     height: 70px;
+  }
+
+  .drink-likely-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 0.7em;
+    top: -6px;
+    right: -6px;
   }
 
   .drink-tooltip {

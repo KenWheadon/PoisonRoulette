@@ -3,8 +3,8 @@ const GAME_CONFIG = {
   initialHealth: 50,
   initialSabotage: 1,
   initialToxin: 0,
-  firstRoundDrinks: 8,
-  subsequentRoundDrinks: 10,
+  firstRoundDrinks: 6, // Changed from 8 to 6
+  subsequentRoundDrinks: 6, // Changed from 10 to 6
   toxinDecayRate: 2,
   toastDuration: 4000,
 };
@@ -74,37 +74,73 @@ const POTION_DATA = {
     heal: { chance: 40, amount: 15 },
     sabotage: { chance: 40, amount: 2 },
     toxin: { chance: 20, amount: 4 },
+    mostLikely: "heal", // Added most likely outcome
   },
   green: {
     name: "Green Brew",
     heal: { chance: 30, amount: 20 },
     sabotage: { chance: 50, amount: 4 },
     damage: { chance: 20, amount: 25 },
+    mostLikely: "sabotage", // Added most likely outcome
   },
   yellow: {
     name: "Yellow Mixture",
     heal: { chance: 40, amount: 25 },
     sabotage: { chance: 20, amount: 3 },
     toxin: { chance: 40, amount: 5 },
+    mostLikely: "heal", // Added most likely outcome (tied with toxin, but heal is more positive)
   },
   red: {
     name: "Red Potion",
     heal: { chance: 20, amount: 30 },
     sabotage: { chance: 30, amount: 6 },
     damage: { chance: 50, amount: 40 },
+    mostLikely: "damage", // Added most likely outcome
   },
   purple: {
     name: "Purple Draught",
     heal: { chance: 15, amount: 45 },
     sabotage: { chance: 25, amount: 8 },
     toxin: { chance: 60, amount: 8 },
+    mostLikely: "toxin", // Added most likely outcome
   },
   black: {
     name: "Black Essence",
     heal: { chance: 10, amount: 60 },
     sabotage: { chance: 20, amount: 10 },
     damage: { chance: 70, amount: 50 },
+    mostLikely: "damage", // Added most likely outcome
   },
+};
+
+// NEW: Round-based drink availability
+const ROUND_DRINK_COLORS = {
+  1: ["blue", "green"], // Round 1: Blue and Green only
+  2: ["blue", "green", "yellow", "red"], // Round 2: Blue, Green, Yellow, Red
+  3: ["blue", "green", "yellow", "red", "purple", "green"], // Round 3+: All colors including double green
+};
+
+// NEW: Round-based action availability
+const ROUND_ACTIONS = {
+  1: ["analyze", "eliminate"], // Round 1: Analyze and Eliminate only
+  2: ["analyze", "eliminate", "poison", "spike"], // Round 2: + Poison and Spike
+  3: [
+    "analyze",
+    "eliminate",
+    "poison",
+    "spike",
+    "duplicate",
+    "neutralize",
+    "deadly_poison",
+  ], // Round 3+: All actions
+};
+
+// NEW: Most likely outcome icons
+const OUTCOME_ICONS = {
+  heal: "❤️",
+  sabotage: "🔧",
+  damage: "💥",
+  toxin: "☠️",
 };
 
 // AI Behavior
@@ -159,6 +195,8 @@ Object.keys(POTION_DATA).forEach((color) => {
   DRINK_EFFECTS[color] = {
     name: data.name,
     outcomes: [],
+    mostLikely: data.mostLikely,
+    mostLikelyIcon: OUTCOME_ICONS[data.mostLikely],
   };
 
   // Add heal outcome
@@ -207,49 +245,60 @@ Object.keys(POTION_DATA).forEach((color) => {
   }
 });
 
-// Generate actions array
+// Generate actions array - NOW INCLUDES TOOLTIPS
 const ACTIONS = [
   {
     id: "duplicate",
     name: "Duplicate",
     cost: ACTION_CONFIG.costs.duplicate,
     description: "Create a copy of selected drink",
+    tooltip:
+      "Creates an exact copy of the selected drink with the same properties and modifications",
   },
   {
     id: "neutralize",
     name: "Neutralize",
     cost: ACTION_CONFIG.costs.neutralize,
     description: `Make drink give +${ACTION_CONFIG.effects.neutralizeHealing} health only`,
+    tooltip:
+      "Removes all negative effects from the drink and makes it only provide healing",
   },
   {
     id: "eliminate",
     name: "Eliminate",
     cost: ACTION_CONFIG.costs.eliminate,
     description: "Remove drink from play",
+    tooltip: "Permanently removes the selected drink from the game",
   },
   {
     id: "analyze",
     name: "Analyze",
     cost: ACTION_CONFIG.costs.analyze,
     description: "Reveal exact effects of drink",
+    tooltip:
+      "Shows the actual outcome the drink will have when consumed (resolves RNG)",
   },
   {
     id: "spike",
     name: "Spike",
     cost: ACTION_CONFIG.costs.spike,
     description: `Add +${ACTION_CONFIG.effects.spikeExtraDamage} damage to drink`,
+    tooltip: "Adds extra damage to the drink's effect when consumed",
   },
   {
     id: "poison",
     name: "Poison",
     cost: ACTION_CONFIG.costs.poison,
     description: `Add +${ACTION_CONFIG.effects.poisonExtraToxin} toxin to drink`,
+    tooltip: "Adds extra toxin damage to the drink's effect when consumed",
   },
   {
     id: "deadly_poison",
     name: "Deadly Poison",
     cost: ACTION_CONFIG.costs.deadly_poison,
     description: `Add +${ACTION_CONFIG.effects.deadlyPoisonExtraToxin} toxin to drink`,
+    tooltip:
+      "Adds a large amount of toxin damage to the drink's effect when consumed",
   },
 ];
 
@@ -324,6 +373,25 @@ Object.keys(POTION_DATA).forEach((color) => {
 
   DRINK_PROBABILITY_TEXT[color] = parts.join(", ");
 });
+
+// NEW: Function to get available drink colors for current round
+function getAvailableDrinkColors(round) {
+  if (round === 1) return ROUND_DRINK_COLORS[1];
+  if (round === 2) return ROUND_DRINK_COLORS[2];
+  return ROUND_DRINK_COLORS[3]; // Round 3 and beyond
+}
+
+// NEW: Function to get available actions for current round
+function getAvailableActions(round) {
+  if (round === 1) return ROUND_ACTIONS[1];
+  if (round === 2) return ROUND_ACTIONS[2];
+  return ROUND_ACTIONS[3]; // Round 3 and beyond
+}
+
+// NEW: Function to get display health (divided by 10)
+function getDisplayHealth(health) {
+  return Math.round((health / 10) * 10) / 10; // Round to 1 decimal place
+}
 
 // Other required constants
 const DRINK_COLORS = ["blue", "green", "yellow", "red", "purple", "black"];

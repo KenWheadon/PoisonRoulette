@@ -77,18 +77,22 @@ function applyTimingConfigToCSS() {
   );
 }
 
-// Generate Drinks for Current Round
+// Generate Drinks for Current Round - UPDATED FOR ROUND-BASED SYSTEM
 function generateDrinks() {
   gameState.drinks = [];
 
-  // Determine number of drinks based on round
-  const numDrinks =
-    gameState.round === 1
-      ? GAME_CONFIG.firstRoundDrinks
-      : GAME_CONFIG.subsequentRoundDrinks;
+  // Always generate 6 drinks per round
+  const numDrinks = GAME_CONFIG.firstRoundDrinks;
+  const availableColors = getAvailableDrinkColors(gameState.round);
 
   for (let i = 0; i < numDrinks; i++) {
-    const color = DRINK_COLORS[Math.floor(Math.random() * DRINK_COLORS.length)];
+    const color =
+      availableColors[Math.floor(Math.random() * availableColors.length)];
+
+    // NEW: Pre-resolve the drink outcome when created (for analyze action)
+    const possibleOutcomes = DRINK_EFFECTS[color].outcomes;
+    const resolvedOutcome = getRandomOutcome({ outcomes: possibleOutcomes });
+
     gameState.drinks.push({
       id: gameState.drinks.length,
       color: color,
@@ -100,6 +104,8 @@ function generateDrinks() {
       effects: null,
       poisoned: false,
       poisonAmount: 0,
+      // NEW: Store the pre-resolved outcome for actions
+      resolvedOutcome: resolvedOutcome,
     });
   }
 }
@@ -118,7 +124,7 @@ function updateTurnOrder() {
   display.textContent = currentPlayerName;
 }
 
-// NEW: Update Game Progress Display
+// UPDATE: Game Progress Display with corrected drinks count
 function updateGameProgress() {
   const roundDisplay = document.getElementById("current-round");
   const drinksCountDisplay = document.getElementById("drinks-count");
@@ -130,10 +136,7 @@ function updateGameProgress() {
   if (drinksCountDisplay) drinksCountDisplay.textContent = remainingDrinks;
 
   // Calculate progress based on drinks consumed this round
-  const totalDrinks =
-    gameState.round === 1
-      ? GAME_CONFIG.firstRoundDrinks
-      : GAME_CONFIG.subsequentRoundDrinks;
+  const totalDrinks = GAME_CONFIG.firstRoundDrinks; // Always 6 drinks per round now
   const consumedDrinks = totalDrinks - remainingDrinks;
   const progressPercentage = (consumedDrinks / totalDrinks) * 100;
 
@@ -142,46 +145,10 @@ function updateGameProgress() {
   }
 }
 
-// NEW: Update Action Cost Display
-function updateActionCostDisplay() {
-  const display = document.getElementById("action-costs-display");
-  const costChips = document.getElementById("cost-chips");
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+// REMOVED: Action Cost Display (as requested)
+// This function is no longer used
 
-  if (!display || !costChips) return;
-
-  const hasSelection = gameState.selectedDrink !== null;
-  const isHumanTurn =
-    currentPlayer && currentPlayer.isHuman && currentPlayer.alive;
-
-  if (hasSelection && isHumanTurn && !gameState.gameOver) {
-    display.style.display = "block";
-    costChips.innerHTML = "";
-
-    ACTIONS.forEach((action) => {
-      const chip = document.createElement("div");
-      const canAfford = currentPlayer.sabotage >= action.cost;
-
-      chip.className = `cost-chip ${canAfford ? "affordable" : "expensive"}`;
-      chip.innerHTML = `
-        <span>${action.name}</span>
-        <span>🔧${action.cost}</span>
-      `;
-
-      chip.onclick = () => {
-        if (canAfford) {
-          performAction(action.id);
-        }
-      };
-
-      costChips.appendChild(chip);
-    });
-  } else {
-    display.style.display = "none";
-  }
-}
-
-// NEW: Update Quick Action Bar
+// UPDATE: Quick Action Bar with round-based actions and tooltips
 function updateQuickActionBar() {
   const quickBar = document.getElementById("action-quick-bar");
   const quickActions = document.getElementById("quick-actions");
@@ -210,7 +177,13 @@ function updateQuickActionBar() {
       deadly_poison: "💀",
     };
 
-    ACTIONS.forEach((action) => {
+    // NEW: Get available actions for current round
+    const availableActionIds = getAvailableActions(gameState.round);
+    const availableActions = ACTIONS.filter((action) =>
+      availableActionIds.includes(action.id)
+    );
+
+    availableActions.forEach((action) => {
       const button = document.createElement("div");
       const canAfford = currentPlayer.sabotage >= action.cost;
 
@@ -227,8 +200,8 @@ function updateQuickActionBar() {
         };
       }
 
-      // Add tooltip
-      button.title = action.description;
+      // NEW: Add enhanced tooltip
+      button.title = action.tooltip;
 
       quickActions.appendChild(button);
     });
@@ -244,11 +217,11 @@ function updateDisplay() {
   updateControls();
   updateTurnOrder();
   updateGameProgress();
-  updateActionCostDisplay();
+  // REMOVED: updateActionCostDisplay() as requested
   updateQuickActionBar();
 }
 
-// Update Player Display Cards - NOW WITH INTEGRATED STATS
+// UPDATE: Player Display with Health Division by 10
 function updatePlayers() {
   const grid = document.getElementById("players-grid");
   grid.innerHTML = "";
@@ -262,6 +235,8 @@ function updatePlayers() {
       playerDiv.classList.add("current-turn");
     }
 
+    // NEW: Health display divided by 10
+    const displayHealth = getDisplayHealth(player.health);
     const healthPercentage = Math.max(0, Math.min(100, player.health));
 
     playerDiv.innerHTML = `
@@ -269,7 +244,7 @@ function updatePlayers() {
       <div class="health-bar">
         <div class="health-fill" style="width: ${healthPercentage}%"></div>
       </div>
-      <div class="health-display">Health: ${player.health}</div>
+      <div class="health-display">Health: ${displayHealth}</div>
       <div class="player-stats">
         <div class="stat-item sabotage-stat" id="sabotage-${index}">
           <span class="stat-icon">🔧</span>
@@ -287,7 +262,7 @@ function updatePlayers() {
   });
 }
 
-// Update Drinks Display
+// UPDATE: Drinks Display with Most Likely Icons
 function updateDrinks() {
   const container = document.getElementById("drinks-container");
   container.innerHTML = "";
@@ -303,6 +278,11 @@ function updateDrinks() {
       drinkDiv.className = classes;
       drinkDiv.onclick = () => selectDrink(drink.id);
 
+      // NEW: Add most likely outcome icon
+      const mostLikelyIcon = document.createElement("div");
+      mostLikelyIcon.className = "drink-likely-icon";
+      mostLikelyIcon.textContent = DRINK_EFFECTS[drink.color].mostLikelyIcon;
+
       // Create tooltip
       const tooltip = document.createElement("div");
       tooltip.className = "drink-tooltip";
@@ -310,14 +290,14 @@ function updateDrinks() {
       let tooltipContent = `<div class="tooltip-header"><strong>${drink.name}</strong></div>`;
 
       if (drink.analyzed) {
-        // Show all possible outcomes for analyzed drinks
-        const effects = DRINK_EFFECTS[drink.color];
+        // NEW: Show actual resolved outcome for analyzed drinks
         tooltipContent +=
-          '<div class="tooltip-analyzed">ANALYZED - All outcomes:</div>';
+          '<div class="tooltip-analyzed">ANALYZED - Actual outcome:</div>';
         tooltipContent += '<div class="tooltip-effects">';
-        effects.outcomes.forEach((outcome) => {
-          tooltipContent += `<div class="tooltip-outcome">${outcome.chance}% - ${outcome.description}</div>`;
-        });
+        const actualOutcome = drink.resolvedOutcome;
+        tooltipContent += `<div class="tooltip-outcome">Will provide: ${getEffectsText(
+          actualOutcome
+        )}</div>`;
         tooltipContent += "</div>";
       } else {
         // Show structured effects in three columns
@@ -363,7 +343,10 @@ function updateDrinks() {
 
       tooltip.innerHTML = tooltipContent;
 
-      drinkDiv.innerHTML = `<div class="drink-liquid"></div>`;
+      drinkDiv.innerHTML = `
+        <div class="drink-liquid"></div>
+      `;
+      drinkDiv.appendChild(mostLikelyIcon);
       drinkDiv.appendChild(tooltip);
       container.appendChild(drinkDiv);
     }
@@ -439,7 +422,7 @@ function drinkSelected() {
   }
 }
 
-// Process Drinking a Potion
+// UPDATE: Process Drinking with Pre-resolved Outcomes
 function processDrink(player, drink) {
   drink.consumed = true;
 
@@ -447,7 +430,9 @@ function processDrink(player, drink) {
   if (drink.neutralized) {
     outcome = ACTION_EFFECTS.neutralize;
   } else {
-    outcome = getRandomOutcome(DRINK_EFFECTS[drink.color]);
+    // NEW: Use pre-resolved outcome instead of random generation
+    outcome = drink.resolvedOutcome;
+
     if (drink.spiked) {
       outcome = {
         ...outcome,
@@ -595,12 +580,13 @@ function showEnhancedHealthChange(playerIndex, change) {
       }, TIMING_CONFIG.statHighlightDuration);
     }
 
-    // Create enhanced change indicator
+    // Create enhanced change indicator with display health
     const changeElement = document.createElement("div");
     changeElement.className = `stat-change-enhanced ${
       change > 0 ? "positive" : "negative"
     }`;
-    changeElement.textContent = `${change > 0 ? "+" : ""}${change} ❤️`;
+    const displayChange = getDisplayHealth(Math.abs(change));
+    changeElement.textContent = `${change > 0 ? "+" : "-"}${displayChange} ❤️`;
 
     playerCard.style.position = "relative";
     playerCard.appendChild(changeElement);
@@ -621,10 +607,20 @@ function showTurnSummary(playerName, changes) {
   let changesHtml = "";
   changes.forEach((change) => {
     const changeClass = change.value > 0 ? "positive" : "negative";
+    let displayValue = change.value;
+
+    // Apply health division to health changes in summary
+    if (change.type === "health") {
+      displayValue = getDisplayHealth(Math.abs(change.value));
+      displayValue = change.value > 0 ? `+${displayValue}` : `-${displayValue}`;
+    } else {
+      displayValue = change.value > 0 ? `+${change.value}` : `${change.value}`;
+    }
+
     changesHtml += `
       <div class="summary-change-item ${changeClass}">
         <div>${change.icon}</div>
-        <div>${change.value > 0 ? "+" : ""}${change.value}</div>
+        <div>${displayValue}</div>
       </div>
     `;
   });
@@ -666,20 +662,22 @@ function getRandomOutcome(drinkEffect) {
   return drinkEffect.outcomes[0];
 }
 
-// Get Effects Text for Display
+// NEW: Get Effects Text for Display with Health Division
 function getEffectsText(effect) {
   const effects = [];
-  if (effect.health !== 0)
-    effects.push(`${effect.health > 0 ? "+" : ""}${effect.health}❤️`);
+  if (effect.health !== 0) {
+    const displayHealth = getDisplayHealth(Math.abs(effect.health));
+    effects.push(`${effect.health > 0 ? "+" : "-"}${displayHealth}❤️`);
+  }
   if (effect.sabotage !== 0)
     effects.push(`${effect.sabotage > 0 ? "+" : ""}${effect.sabotage}🔧`);
   if (effect.toxin !== 0)
     effects.push(`${effect.toxin > 0 ? "+" : ""}${effect.toxin}☠️`);
-  if (effect.steal) effects.push(`Steal ${effect.steal}❤️`);
+  if (effect.steal) effects.push(`Steal ${getDisplayHealth(effect.steal)}❤️`);
   return effects.join(" ");
 }
 
-// Action Modal Functions
+// UPDATE: Action Modal with Round-based Actions and Tooltips
 function openActionModal() {
   if (gameState.selectedDrink === null) return;
 
@@ -689,7 +687,13 @@ function openActionModal() {
 
   actionButtons.innerHTML = "";
 
-  ACTIONS.forEach((action) => {
+  // NEW: Get available actions for current round
+  const availableActionIds = getAvailableActions(gameState.round);
+  const availableActions = ACTIONS.filter((action) =>
+    availableActionIds.includes(action.id)
+  );
+
+  availableActions.forEach((action) => {
     const button = document.createElement("button");
     button.className = "action-btn";
     button.innerHTML = `<strong>${action.name}</strong><br>${action.cost} 🔧<br><small>${action.description}</small>`;
@@ -698,6 +702,10 @@ function openActionModal() {
       performAction(action.id);
       closeActionModal();
     };
+
+    // NEW: Add tooltip
+    button.title = action.tooltip;
+
     actionButtons.appendChild(button);
   });
 
@@ -708,7 +716,7 @@ function closeActionModal() {
   document.getElementById("action-modal").style.display = "none";
 }
 
-// Perform Action - UPDATED FOR QUICK BAR
+// UPDATE: Perform Action with New Resolution System
 function performAction(actionId) {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   const action = ACTIONS.find((a) => a.id === actionId);
@@ -720,7 +728,12 @@ function performAction(actionId) {
 
   switch (actionId) {
     case "duplicate":
-      const newDrink = { ...drink, id: gameState.drinks.length };
+      const newDrink = {
+        ...drink,
+        id: gameState.drinks.length,
+        // NEW: Duplicate also gets a new resolved outcome
+        resolvedOutcome: getRandomOutcome(DRINK_EFFECTS[drink.color]),
+      };
       gameState.drinks.push(newDrink);
       break;
 
@@ -734,6 +747,7 @@ function performAction(actionId) {
 
     case "analyze":
       drink.analyzed = true;
+      // NOTE: The resolved outcome is already stored, so analyze just reveals it
       break;
 
     case "spike":
@@ -835,7 +849,7 @@ function findNextPlayerIndex() {
   return gameState.players[nextIndex].alive ? nextIndex : -1;
 }
 
-// AI Turn Logic
+// UPDATE: AI Turn Logic with Round-based Actions
 function aiTurn() {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   if (!currentPlayer.alive || gameState.gameOver) return;
@@ -848,17 +862,23 @@ function aiTurn() {
   }
 
   // AI decides whether to use action or drink
+  const availableActionIds = getAvailableActions(gameState.round);
+  const availableActions = ACTIONS.filter((action) =>
+    availableActionIds.includes(action.id)
+  );
   const hasActionPoints = currentPlayer.sabotage >= 2;
   const shouldUseAction =
-    hasActionPoints && Math.random() < AI_CONFIG.actionUseChance;
+    hasActionPoints &&
+    availableActions.length > 0 &&
+    Math.random() < AI_CONFIG.actionUseChance;
 
   const randomDrink =
     availableDrinks[Math.floor(Math.random() * availableDrinks.length)];
   gameState.selectedDrink = randomDrink.id;
 
   if (shouldUseAction) {
-    // Use random action
-    const affordableActions = ACTIONS.filter(
+    // Use random action from available actions
+    const affordableActions = availableActions.filter(
       (a) => currentPlayer.sabotage >= a.cost
     );
     if (affordableActions.length > 0) {
@@ -949,7 +969,7 @@ function showStatChangeInCard(playerIndex, statType, change) {
   }
 }
 
-// Drink Outcome Modal
+// UPDATE: Drink Outcome Modal with Health Division
 function showDrinkOutcome(player, drink, outcome) {
   const modal = document.getElementById("outcome-modal");
   const content = document.getElementById("outcome-content");
@@ -976,28 +996,36 @@ function showDrinkOutcome(player, drink, outcome) {
   // Set content
   title.textContent = `${player.name} drank ${drink.name}!`;
 
-  // Show effects
+  // Show effects with health division
   effects.innerHTML = "";
   const effectsToShow = [
-    { label: "❤️ Health", value: outcome.health },
-    { label: "🔧 Sabotage", value: outcome.sabotage },
-    { label: "☠️ Toxin", value: outcome.toxin },
+    { label: "❤️ Health", value: outcome.health, isHealth: true },
+    { label: "🔧 Sabotage", value: outcome.sabotage, isHealth: false },
+    { label: "☠️ Toxin", value: outcome.toxin, isHealth: false },
   ].filter((effect) => effect.value !== 0);
 
   effectsToShow.forEach((effect) => {
     const effectDiv = document.createElement("div");
     const effectType = effect.value > 0 ? "positive" : "negative";
     effectDiv.className = `effect-item ${effectType}`;
-    effectDiv.innerHTML = `${effect.label}<br>${effect.value > 0 ? "+" : ""}${
-      effect.value
-    }`;
+
+    let displayValue = effect.value;
+    if (effect.isHealth) {
+      displayValue = getDisplayHealth(Math.abs(effect.value));
+      displayValue = effect.value > 0 ? `+${displayValue}` : `-${displayValue}`;
+    } else {
+      displayValue = effect.value > 0 ? `+${effect.value}` : `${effect.value}`;
+    }
+
+    effectDiv.innerHTML = `${effect.label}<br>${displayValue}`;
     effects.appendChild(effectDiv);
   });
 
   if (outcome.steal) {
     const stealDiv = document.createElement("div");
     stealDiv.className = "effect-item positive";
-    stealDiv.innerHTML = `💀 Steal<br>+${outcome.steal} from all`;
+    const stealDisplay = getDisplayHealth(outcome.steal);
+    stealDiv.innerHTML = `💀 Steal<br>+${stealDisplay} from all`;
     effects.appendChild(stealDiv);
   }
 
